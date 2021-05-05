@@ -58,6 +58,7 @@ const NavigationAuth = () => (
           path={ROUTES.ROOM}
           title="Account" icon={IconBookmark}
         />
+          {/* <SignOutButton /> */}
       </Column>
       <Column flexGrow={1}></Column>
       <ProfileImage 
