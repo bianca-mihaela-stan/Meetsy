@@ -6,11 +6,22 @@ import { SignUpLink } from '../SignUp';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import { PasswordForgetLink } from '../PasswordForget'; 
+import {Column, Row} from 'simple-flexbox';
+import { StyleSheet, css } from 'aphrodite';
+
+const styles = StyleSheet.create({
+  container : {
+      width: '40vw',
+      backgroundImage: 'url("https://images.unsplash.com/photo-1605707357299-9b4bf4dfb15a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80")',
+      height: '100vh',
+      backgroundSize: 'cover'
+  }
+});
 
 
 const SignInPage = () => (
   <div>
-    <h1>SignIn</h1>
+    
     <SignInForm />
     <PasswordForgetLink />
     <SignUpLink />
