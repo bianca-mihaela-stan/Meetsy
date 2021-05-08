@@ -6,4 +6,5 @@ export const ACCOUNT = '/account';
 export const ADMIN = '/admin';
 export const PASSWORD_FORGET = '/pw-forget';
 export const ROOM = '/room';
-export const MEET ='/meet';
+export const MEET = '/meet';
+export const CALENDAR = '/calendar';

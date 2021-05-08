@@ -8,7 +8,8 @@ import { AuthUserContext } from '../Session';
 import IconHome from '../../assets/icon-home.js';
 import IconAccount from '../../assets/icon-account.js';
 import MenuItemComponent from './MenuItemComponent';
-import IconBookmark from '../../assets/icon-bookmark.js';
+import IconMeeting from '../../assets/icon-meeting.js';
+import IconCalendar from '../../assets/icon-calendar.js';
 import ProfileImage from './ProfileImage';
 const styles = StyleSheet.create({
   container: {
@@ -42,6 +43,7 @@ const Navigation = () => (
     </AuthUserContext.Consumer>
   </div>
 );
+
 const NavigationAuth = () => (
   <Column className={css(styles.container)}>
     <Column className={css(styles.menuCtn)}>
@@ -56,19 +58,24 @@ const NavigationAuth = () => (
         />
         <MenuItemComponent
           path={ROUTES.ROOM}
-          title="Account" icon={IconBookmark}
+          title="Meeting" icon={IconMeeting}
         />
-          {/* <SignOutButton /> */}
+        <MenuItemComponent
+          path={ROUTES.CALENDAR}
+          title="Calendar" icon={IconCalendar}
+        />
+        {/* <SignOutButton /> */}
       </Column>
       <Column flexGrow={1}></Column>
-      <ProfileImage 
-      path={ROUTES.ACCOUNT}
-      title="Profile"
-      content="https://live.staticflickr.com/2942/15151618028_b3132b52d8_b.jpg">
+      <ProfileImage
+        path={ROUTES.ACCOUNT}
+        title="Profile"
+        content="https://live.staticflickr.com/2942/15151618028_b3132b52d8_b.jpg">
       </ProfileImage>
     </Column>
   </Column>
 );
+
 const NavigationNonAuth = () => (
   <ul>
     <li>
