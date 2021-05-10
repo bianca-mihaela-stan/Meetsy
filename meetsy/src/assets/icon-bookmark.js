@@ -1,8 +1,11 @@
 import React from 'react';
 
 const icon =  {
-     height: '23px',
-     fill: '#efefef'
+     height: '18px',
+     fill: 'gray',
+     ':hover': {
+       fill: '#efefef !important',
+     }
    };
 
 

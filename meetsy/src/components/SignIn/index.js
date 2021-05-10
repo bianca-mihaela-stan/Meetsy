@@ -1,31 +1,108 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
- 
 import { SignUpLink } from '../SignUp';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import { PasswordForgetLink } from '../PasswordForget'; 
-import {Column, Row} from 'simple-flexbox';
 import { StyleSheet, css } from 'aphrodite';
+import  styled  from "styled-components";
 
-const styles = StyleSheet.create({
-  container : {
-      width: '40vw',
-      backgroundImage: 'url("https://images.unsplash.com/photo-1605707357299-9b4bf4dfb15a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80")',
-      height: '100vh',
-      backgroundSize: 'cover'
+
+const SignInLink = () => (
+  <p>
+    Already have an account? <Link to={ROUTES.SIGN_IN}>Sign In</Link>
+  </p>
+);
+
+const heading = {
+           marginBottom: '2rem',
+           alignSelf: 'center'
+     };
+const form = {
+  marginTop: '10%',
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'column',
+  alignContent: 'center',
+  justifyContent: 'center',
+  boxSizing: 'initial'
+ };
+const StyledButton  =  styled.button`
+  width: 75%;
+  max-width: 350px;
+  min-width: 250px;
+  height: 40px;
+  border: none;
+  margin: 1rem 0;
+  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
+  border-radius: 32px;
+  background-color: #3e6ae1;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  &:hover {
+    background-color: #3457b1;
   }
-});
+`;
 
+
+const Container = styled.div`
+     h4 {
+        font-size: 14px;
+        color: white;
+        marginTop: 2rem;
+     }
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     p 
+     {
+       color: #fff !important;
+     }
+`;
+const StyledInput = styled.input`
+ width: 80%;
+ max-width: 350px;
+ min-width: 250px;
+ height: 40px;
+ border: none;
+ margin: 0.5rem 0;
+ background-color: #f5f5f5;
+ box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
+ border-radius: 32px;
+ padding:  0 1rem;
+ &:hover{
+  outline-width: 0;
+ }
+ &:focus{
+  outline-width: 0;
+  // border: 3px solid rgb(62,106,225,0.7);
+ }
+`;
+const StyledContainer = styled.div`
+display:flex;
+flex-direction: column;
+align-items: center;
+justify-content:center;
+width: 100%;
+height: 100%;
+padding: 0;
+margin: 0;
+`;
+const inputCtn = {
+   display: 'flex',
+   justifyContent: 'center',
+   alignContent: 'center'
+};
 
 const SignInPage = () => (
-  <div>
-    
+    <Container>
     <SignInForm />
     <PasswordForgetLink />
     <SignUpLink />
-  </div>
+    </Container>
 );
  
 const INITIAL_STATE = {
@@ -67,24 +144,27 @@ class SignInFormBase extends Component {
     const isInvalid = password === '' || email === '';
  
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
+      <form style={form} onSubmit={this.onSubmit}>
+      <h3 style={heading}>Sign in</h3>
+      <div style={inputCtn}>
+      <StyledInput
           name="email"
           value={email}
           onChange={this.onChange}
           type="text"
           placeholder="Email Address"
-        />
-        <input
+        /></div>
+        <div style={inputCtn}>
+        <StyledInput
           name="password"
           value={password}
           onChange={this.onChange}
           type="password"
           placeholder="Password"
-        />
-        <button disabled={isInvalid} type="submit">
+        /></div>
+         <StyledButton  disabled={isInvalid} type="submit">
           Sign In
-        </button>
+          </StyledButton >
  
         {error && <p>{error.message}</p>}
       </form>
@@ -99,4 +179,4 @@ const SignInForm = compose(
  
 export default SignInPage;
  
-export { SignInForm };
+export { SignInForm, SignInLink };
