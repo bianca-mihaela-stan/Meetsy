@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import bgImg from '../../assets/bg2.jpg';
+import bgImg from '../../assets/bg.png';
 import MainLanding from './MainLanding';
 import SidebarLanding from './SidebarLanding';
 const Landing = () => (
@@ -14,7 +14,7 @@ const Landing = () => (
   </div>
 );
 const Container = styled.div`
-background: #eefcff;
+background: rgb(19, 21, 22);
 position: absolute;
 top:0;
 left: 0;
@@ -23,7 +23,7 @@ right:0;
 `;
 const Wrapper = styled.div`
   background-image: url(${bgImg});
-  background-position: center;
+  background-position: top;
   background-size: cover;
   background-repeat: no-repeat;
   width: 100%;

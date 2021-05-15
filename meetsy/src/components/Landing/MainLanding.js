@@ -4,7 +4,7 @@ import styled from "styled-components";
 const MainLanding = () => {
     return (
         <Container>
-            <h1> Reach higher. Join us<br/> to shape the future.</h1>
+            {/* <h1> Reach higher. Join us<br/> to shape the future.</h1> */}
         </Container>
     )
 }
