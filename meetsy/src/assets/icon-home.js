@@ -1,7 +1,7 @@
 import React from 'react';
 
 const icon =  {
-  height: '23px',
+  height: '18px',
    fill: '#efefef'
 };
 

@@ -321,7 +321,7 @@ class Meet extends Component {
 							let video = document.createElement('video')
 
 							let css = {minWidth: cssMesure.minWidth, minHeight: cssMesure.minHeight, maxHeight: "100%", margin: "10px",
-								borderStyle: "solid", borderColor: "#bdbdbd", objectFit: "fill"}
+								borderStyle: "solid", borderRadius: "25px", objectFit: "cover"}
 							for(let i in css) video.style[i] = css[i]
 
 							video.style.setProperty("width", cssMesure.width)
@@ -475,7 +475,7 @@ class Meet extends Component {
 					</div>
 					:
 					<div>
-						<div className="btn-down" style={{ backgroundColor: "whitesmoke", color: "whitesmoke", textAlign: "center" }}>
+						<div className="btn-down" style={{color: "whitesmoke", textAlign: "center" }}>
 							<IconButton style={{ color: "#424242" }} onClick={this.handleVideo}>
 								{(this.state.video === true) ? <VideocamIcon /> : <VideocamOffIcon />}
 							</IconButton>
@@ -528,7 +528,7 @@ class Meet extends Component {
 
 							<Row id="main" className="flex-container" style={{ margin: 0, padding: 0 }}>
 								<video id="my-video" ref={this.localVideoref} autoPlay muted style={{
-									borderStyle: "solid",borderColor: "#bdbdbd",margin: "10px",objectFit: "fill",
+									borderStyle: "solid",borderRadius: "25px",margin: "10px",objectFit: "cover",
 									width: "100%",height: "100%"}}></video>
 							</Row>
 						</div>

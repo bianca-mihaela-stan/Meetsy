@@ -13,10 +13,12 @@ import CalendarPage from '../Calendar';
 import AdminPage from '../Admin';
 import Room from '../Room';
 import Meet from '../Meet'
-
+import { AuthUserContext } from '../Session';
+ 
 import * as ROUTES from '../../constants/routes';
 import { withAuthentication } from '../Session';
-
+import HeaderComponent from '../Header';
+ 
 const styles = StyleSheet.create({
   container: {
     height: '100vh'
@@ -25,10 +27,10 @@ const styles = StyleSheet.create({
     marginTop: 54
   },
   mainBlock: {
-    // backgroundColor: '#F7F8FC',
-    // #1C1F21
-    backgroundColor: '#131516',
-    padding: 30
+      // backgroundColor: '#F7F8FC',
+      // #1C1F21 #131516 
+      backgroundColor: '#131516',
+      padding: 30
   }
 });
 
@@ -36,9 +38,14 @@ const App = () => (
 
   <Router>
     <div>
-      <Row className={css(styles.container)}>
-        <Navigation />
-        <Column flexGrow={1} className={css(styles.mainBlock)}>
+    <Row className={css(styles.container)}>
+      <Navigation />
+      <Column flexGrow={1} className={css(styles.mainBlock)}>
+      <AuthUserContext.Consumer>
+      {authUser =>
+        authUser ? <HeaderComponent/> : void 0
+      }
+    </AuthUserContext.Consumer>
           <Route exact path={ROUTES.LANDING} component={LandingPage} />
           <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
           <Route path={ROUTES.SIGN_IN} component={SignInPage} />

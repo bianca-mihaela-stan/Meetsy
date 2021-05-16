@@ -18,8 +18,11 @@ const styles = StyleSheet.create({
     container: {
         cursor: 'pointer',
         flexDirection: 'column',
-        paddingTop: '12%',
-        paddingBottom: '12%'
+        paddingTop: '18%',
+        paddingBottom: '18%',
+        ':hover': { 
+            backgroundColor: '#131516'
+        }
     },
     title: {
         fontSize: 16,
@@ -29,11 +32,7 @@ const styles = StyleSheet.create({
         textDecoration: 'none'
     },
     iconCtn : {
-      borderRadius: '50%',
-      padding: '8px',
-      ':hover': {
-        backgroundColor: '#01abf4'
-    },
+      borderRadius: '50%'
     }
 });
 

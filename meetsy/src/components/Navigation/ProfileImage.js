@@ -31,8 +31,8 @@ const styles = StyleSheet.create({
     },
     imageCtn : {
       borderRadius: '50%',
-      width: '47px',
-      height: '47px',
+      width: '35px',
+      height: '35px',
       overflow: 'hidden'
     },
     image: {
@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
 });
 
 function ProfileImage(props){
-    const {path, content,title,...otherProps} = props;
+    const {path, content,title,size,...otherProps} = props;
     const Content = content;
     const Path = path;
     return (
-        <Row className={css(styles.container)} vertical="center">
-        <Link to={Path} className={css(styles.imageCtn)}><img className={css(styles.image)} src={Content}/></Link>
+        <Row className={css(styles.container)}  vertical="center">
+        <Link to={Path} className={css(styles.imageCtn)} style = {{width: {size}, height: {size}}}><img className={css(styles.image)} src={Content}/></Link>
 
         </Row>
     );
