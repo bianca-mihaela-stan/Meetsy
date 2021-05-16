@@ -9,6 +9,7 @@ import SignInPage from '../SignIn';
 import PasswordForgetPage from '../PasswordForget';
 import HomePage from '../Home';
 import AccountPage from '../Account';
+import CalendarPage from '../Calendar';
 import AdminPage from '../Admin';
 import Room from '../Room';
 import Meet from '../Meet'
@@ -20,10 +21,10 @@ import HeaderComponent from '../Header';
  
 const styles = StyleSheet.create({
   container: {
-      height: '100vh'
+    height: '100vh'
   },
   content: {
-      marginTop: 54
+    marginTop: 54
   },
   mainBlock: {
       // backgroundColor: '#F7F8FC',
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
 });
 
 const App = () => (
- 
+
   <Router>
     <div>
     <Row className={css(styles.container)}>
@@ -56,12 +57,13 @@ const App = () => (
           <Route path={ROUTES.HOME} component={HomePage} />
           <Route path={ROUTES.ACCOUNT} component={AccountPage} />
           <Route path={ROUTES.ADMIN} component={AdminPage} />
+          <Route path={ROUTES.CALENDAR} component={CalendarPage} />
           <Route path="/meet/:url" component={Meet} />
-      </Column>
+        </Column>
       </Row>
     </div>
   </Router>
- 
+
 );
- 
+
 export default withAuthentication(App);

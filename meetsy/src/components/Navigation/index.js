@@ -10,7 +10,7 @@ import IconAccount from '../../assets/icon-account.js';
 import IconCall from '../../assets/icon-call.js';
 import IconCalendar from '../../assets/icon-calendar.js';
 import MenuItemComponent from './MenuItemComponent';
-import IconBookmark from '../../assets/icon-bookmark.js';
+import IconMeeting from '../../assets/icon-meeting.js';
 import ProfileImage from './ProfileImage';
 const styles = StyleSheet.create({
   container: {
@@ -46,6 +46,7 @@ const Navigation = () => (
     </AuthUserContext.Consumer>
   </div>
 );
+
 const NavigationAuth = () => (
   <Column className={css(styles.container)} >
     <Column className={css(styles.menuCtn)} >
@@ -60,9 +61,13 @@ const NavigationAuth = () => (
         />
         <MenuItemComponent
           path={ROUTES.ROOM}
-          title="Account" icon={IconCall}
+          title="Meeting" icon={IconMeeting}
         />
-          {/* <SignOutButton /> */}
+        <MenuItemComponent
+          path={ROUTES.CALENDAR}
+          title="Calendar" icon={IconCalendar}
+        />
+        {/* <SignOutButton /> */}
       </Column>
       <Column flexGrow={1}></Column>
      <SignOutButton />
@@ -75,6 +80,7 @@ const NavigationAuth = () => (
     </Column>
   </Column>
 );
+
 const NavigationNonAuth = () => (
   <ul>
     <li>
