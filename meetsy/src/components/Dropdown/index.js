@@ -29,6 +29,7 @@ const useStyles = createUseStyles((theme) => ({
         padding: 0,
         position: 'absolute',
         width: '100%',
+        color: 'black',
         top: ({ position }) => position.top,
         right: ({ position }) => position.right,
         bottom: ({ position }) => position.bottom,
