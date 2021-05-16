@@ -1,40 +1,40 @@
 import React from 'react'
 import styled from 'styled-components';
-import {Row, Column} from 'simple-flexbox';
+import { Row, Column } from 'simple-flexbox';
 import * as ROUTES from '../../constants/routes';
 import { Component } from 'react';
 import { useHistory } from "react-router-dom";
 // shortcut: rafce
 
-function SidebarLanding()  {
+function SidebarLanding() {
 
-    const history = useHistory();
-    const routeSignIn = () => {
-        history.push(ROUTES.SIGN_IN);
-      }
-    const routeSignUp = () => {
-       history.push(ROUTES.SIGN_UP);
-      }
-   
-        return(
-        <Container>
-          <LogoWrapper>
-              <h3>
-                  Meet<span>sy</span></h3>
-             
-          </LogoWrapper>
-          <p>Reach higher. <br/>Join us to shape the future.</p>
-          <Column style={{width: '100%'}}>
-          <StyledButton onClick={routeSignIn}>
-              Sign In
+  const history = useHistory();
+  const routeSignIn = () => {
+    history.push(ROUTES.SIGN_IN);
+  }
+  const routeSignUp = () => {
+    history.push(ROUTES.SIGN_UP);
+  }
+
+  return (
+    <Container>
+      <LogoWrapper>
+        <h3>
+          Meet<span>sy</span></h3>
+
+      </LogoWrapper>
+      <p>Reach higher. <br />Join us to shape the future.</p>
+      <Column style={{ width: '100%' }}>
+        <StyledButton onClick={routeSignIn}>
+          Sign In
           </StyledButton>
-          <StyledButton onClick={routeSignUp}>
-              Sign Up
+        <StyledButton onClick={routeSignUp}>
+          Sign Up
           </StyledButton></Column>
-        </Container>
-        )
+    </Container>
+  )
 }
-const StyledButton  =  styled.button`
+const StyledButton = styled.button`
   width: 75%;
   max-width: 350px;
   min-width: 250px;
