@@ -77,7 +77,8 @@ class SignUpFormBase extends Component {
           .set({
             username,
             email,
-          });
+          },
+          {merge: true});
       })
       .then(() => {
         this.setState({ ...INITIAL_STATE });
@@ -164,14 +165,14 @@ const Container = styled.div`
      align-items: center;
      p 
      {
-       color: #fff !important;
+       color: #fff;
      }
 `;
 const Terms = styled.p` 
    padding: 0 1rem;
    text-align: center;
    font-size: 11px;
-   color: #fff !important;
+   color: #fff;
    font-weight: 300;
 `;
 const StyledInput = styled.input`
@@ -185,6 +186,7 @@ const StyledInput = styled.input`
  box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
  border-radius: 32px;
  padding:  0 1rem;
+ color: #393c41;
  &:hover{
   outline-width: 0;
  }

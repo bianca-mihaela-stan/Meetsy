@@ -87,7 +87,7 @@ padding: 0 2 rem;
 }
 p{
     text-align: center;
-    color: white !important;
+    color: white;
     font-size: 24px;
   }
 `;

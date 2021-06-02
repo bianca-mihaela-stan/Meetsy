@@ -13,13 +13,19 @@ import MenuItemComponent from './MenuItemComponent';
 import IconMeeting from '../../assets/icon-meeting.js';
 import ProfileImage from './ProfileImage';
 const styles = StyleSheet.create({
+  dummyContainer: {
+    marginLeft: '6vw',
+  },
   container: {
     //'#0e0f10
+    position: 'fixed',
     backgroundColor: '#090A0B',
     width: '6vw',
     overflow: 'hidden',
     // borderRight: '1px solid',
-    borderColor: '#363336'
+    borderColor: '#363336',
+    top: '0',
+    left: '0'
 
   },
   menuCtn: {
@@ -48,6 +54,7 @@ const Navigation = () => (
 );
 
 const NavigationAuth = () => (
+  <div className={css(styles.dummyContainer)}>
   <Column className={css(styles.container)} >
     <Column className={css(styles.menuCtn)} >
       <Column className={css(styles.menuItemList)} >
@@ -79,6 +86,7 @@ const NavigationAuth = () => (
       </ProfileImage> */}
     </Column>
   </Column>
+  </div>
 );
 
 const NavigationNonAuth = () => (

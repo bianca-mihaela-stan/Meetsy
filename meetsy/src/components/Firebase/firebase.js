@@ -31,10 +31,8 @@ class Firebase {
       firebase.initializeApp(firebaseConfig);
 
       this.auth = firebase.auth();
-      this.db = firebase.database();
+      this.db = firebase.firestore();
     }
-  
-
   // *** Auth API ***
  
     doCreateUserWithEmailAndPassword = (email, password) =>
@@ -49,12 +47,43 @@ class Firebase {
  
     doPasswordUpdate = password =>
          this.auth.currentUser.updatePassword(password);
-   
+    // ** Merge Auth and DB User API
+    onAuthUserListener = (next, fallback) =>
+         this.auth.onAuthStateChanged(authUser => {
+           if (authUser) {
+             this.user(authUser.uid)
+               .get()
+               .then(snapshot => {
+                 const dbUser = snapshot.data();
+      
+                 // default empty roles
+                 if (!dbUser.roles) {
+                   dbUser.roles = {};
+                 }
+      
+                 // merge auth and db user
+                 authUser = {
+                   uid: authUser.uid,
+                   email: authUser.email,
+                   emailVerified: authUser.emailVerified,
+                   providerData: authUser.providerData,
+                   ...dbUser,
+                 };
+      
+                 next(authUser);
+               });
+           } else {
+             fallback();
+           }
+         });
      // *** User API ***
  
-    user = uid => this.db.ref(`users/${uid}`);
+     user = uid => this.db.doc(`users/${uid}`);
  
-    users = () => this.db.ref('users');
+     users = () => this.db.collection('users');
+    get Db(){
+      return this.db;
+    }
 }
 
 export default Firebase;

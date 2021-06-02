@@ -18,11 +18,9 @@ import { AuthUserContext } from '../Session';
 import * as ROUTES from '../../constants/routes';
 import { withAuthentication } from '../Session';
 import HeaderComponent from '../Header';
- 
+import {COLORS} from '../../constants/designConstants';
 const styles = StyleSheet.create({
-  container: {
-    height: '100vh'
-  },
+
   content: {
     marginTop: 54
   },
@@ -30,7 +28,9 @@ const styles = StyleSheet.create({
       // backgroundColor: '#F7F8FC',
       // #1C1F21 #131516 
       backgroundColor: '#131516',
-      padding: 30
+      padding: 30,
+      minHeight: '100vh',
+      color: `${COLORS.body}`
   }
 });
 
@@ -39,6 +39,7 @@ const App = () => (
   <Router>
     <div>
     <Row className={css(styles.container)}>
+      
       <Navigation />
       <Column flexGrow={1} className={css(styles.mainBlock)}>
       <AuthUserContext.Consumer>
