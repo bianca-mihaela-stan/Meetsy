@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         paddingTop: '18%',
         paddingBottom: '18%',
-        ':hover': { 
+        ':hover': {
             backgroundColor: '#131516'
         }
     },
@@ -31,19 +31,21 @@ const styles = StyleSheet.create({
         color: '#A4A6B3',
         textDecoration: 'none'
     },
-    iconCtn : {
-      borderRadius: '50%'
+    iconCtn: {
+        borderRadius: '50%'
     }
 });
 
-function MenuItemComponent(props){
-    const {path, icon,title,...otherProps} = props;
+function MenuItemComponent(props) {
+    const { path, icon, title, ...otherProps } = props;
     const Icon = icon;
     const Path = path;
     return (
-        <Row className={css(styles.container)} vertical="center">
-        <Link to={Path} className={css(styles.title, styles.iconCtn)}><Icon /></Link>
-        </Row>
+        <Link to={Path} className={css(styles.title, styles.iconCtn)}>
+            <Row className={css(styles.container)} vertical="center">
+                <Icon />
+            </Row>
+        </Link>
     );
 }
 
