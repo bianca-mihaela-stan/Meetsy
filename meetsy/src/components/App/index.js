@@ -47,7 +47,8 @@ class App extends Component {
   }
   componentDidMount(){
     this.props.firebase.auth.onAuthStateChanged(authUser => {
-      console.log("Out here!");
+      this.setState({loading: true})
+      console.log("Out here!", this.state.loading);
        if (authUser) {
          console.log("In here!");
          this.props.firebase.user(authUser.uid)
@@ -67,10 +68,12 @@ class App extends Component {
                providerData: authUser.providerData,
                ...dbUser,
              };
+             console.log("Loading-ul este: " , this.state.loading)
              console.log(this.props.firebase.authUser);  
              this.setState({loading: false})      
            });
        } else {
+          console.log("Loading-ul este pe callback: ", this.state.loading)
           this.setState({loading:false})
        }
      });
