@@ -29,15 +29,21 @@ const StyledButton  =  styled.button`
   margin: 1rem 0;
   box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
   border-radius: 32px;
-  background-color: #3e6ae1;
+  background-color: #01abf4;
   color: white;
   font-weight: 600;
   cursor: pointer;
   align-self: center;
   &:hover {
-    background-color: #3457b1;
+    background-color: #0087e0;
   }
 `;
+const errorMsg = {
+  textAlign: 'center',
+  paddingTop: '1pc',
+  paddingBottom: '1pc',
+  color: '#c70000'
+};
 
 const SignUpPage = () => (
   <Container>
@@ -151,7 +157,7 @@ class SignUpFormBase extends Component {
           Sign Up
         </StyledButton >
 
-        {error && <p>{error.message}</p>}
+        {error && <p style={errorMsg}>{error.message}</p>}
       </form>
     );
   }

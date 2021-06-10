@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from "styled-components";
+import { AuthUserContext, withAuthorization } from '../Session';
 
 const MainLanding = () => {
     return (
@@ -25,4 +26,5 @@ h1 {
 }
 `;
 
-export default MainLanding;
+const condition = authUser => !authUser;
+export default withAuthorization(condition)(MainLanding);
