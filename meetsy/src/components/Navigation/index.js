@@ -63,8 +63,8 @@ const NavigationAuth = () => (
           title="Home" icon={IconHome}
         />
         <MenuItemComponent
-          path={ROUTES.ACCOUNT}
-          title="Account" icon={IconAccount}
+          path={ROUTES.SHOW_TEAMS}
+          title="Teams" icon={IconAccount}
         />
         <MenuItemComponent
           path={ROUTES.ROOM}

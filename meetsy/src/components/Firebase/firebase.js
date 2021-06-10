@@ -32,9 +32,12 @@ class Firebase {
 
       this.auth = firebase.auth();
       this.db = firebase.firestore();
+     
     }
   // *** Auth API ***
- 
+   
+     
+    
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);
 
@@ -48,42 +51,30 @@ class Firebase {
     doPasswordUpdate = password =>
          this.auth.currentUser.updatePassword(password);
     // ** Merge Auth and DB User API
-    onAuthUserListener = (next, fallback) =>
-         this.auth.onAuthStateChanged(authUser => {
-           if (authUser) {
-             this.user(authUser.uid)
-               .get()
-               .then(snapshot => {
-                 const dbUser = snapshot.data();
-      
-                 // default empty roles
-                 if (!dbUser.roles) {
-                   dbUser.roles = {};
-                 }
-      
-                 // merge auth and db user
-                 authUser = {
-                   uid: authUser.uid,
-                   email: authUser.email,
-                   emailVerified: authUser.emailVerified,
-                   providerData: authUser.providerData,
-                   ...dbUser,
-                 };
-      
-                 next(authUser);
-               });
-           } else {
-             fallback();
-           }
-         });
+    
      // *** User API ***
- 
+     get dbUser(){
+       this.user(this.auth.currentUser.uid).get().then(query => {
+         return query.data();
+       }).catch((error) => {
+         console.log("No such user!");
+       })
+     }
      user = uid => this.db.doc(`users/${uid}`);
  
      users = () => this.db.collection('users');
-    get Db(){
-      return this.db;
-    }
+
+     userByEmail = email => this.db.collection('users').where('email',"==", email.trim());
+
+     // not working - not updating onSnapshot
+     usersByTeam = (tid) => this.db.collection('users').where('teams','array-contains-any',[tid]);
+     usersByIds = ids => this.db.collection('users').where('userId','in',ids);
+
+    // ** Team API ***
+
+     team = uid => this.db.doc(`teams/${uid}`);
+     teams = () => this.db.collection('teams');
+
 }
 
 export default Firebase;

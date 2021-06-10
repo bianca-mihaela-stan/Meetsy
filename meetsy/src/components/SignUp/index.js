@@ -77,6 +77,8 @@ class SignUpFormBase extends Component {
           .set({
             username,
             email,
+            userId: authUser.user.uid,
+            teams: []
           },
           {merge: true});
       })
