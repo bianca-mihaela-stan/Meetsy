@@ -1,6 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import io from 'socket.io-client'
 import faker from "faker"
+import { AnchorButton, Intent,  } from "@blueprintjs/core"
+import axios from 'axios';
 
 import {IconButton, Badge, Input, Button} from '@material-ui/core'
 import VideocamIcon from '@material-ui/icons/Videocam'
@@ -12,8 +14,9 @@ import StopScreenShareIcon from '@material-ui/icons/StopScreenShare'
 import CallEndIcon from '@material-ui/icons/CallEnd'
 import ChatIcon from '@material-ui/icons/Chat'
 
-import { message } from 'antd'
+import { Anchor, message } from 'antd'
 import 'antd/dist/antd.css'
+import './drop.scss';
 
 import { Row } from 'simple-flexbox'
 import Modal from 'react-bootstrap/Modal'
@@ -33,12 +36,15 @@ var socket = null
 var socketId = null
 var elms = 0
 
+
+
 class Meet extends Component {
 	constructor(props) {
 		super(props)
 
 		this.localVideoref = React.createRef()
-
+        // this.file_input = React.createRef()
+        // this.drop_region_container = React.createRef()
 		this.videoAvailable = false
 		this.audioAvailable = false
 
@@ -47,12 +53,17 @@ class Meet extends Component {
 			audio: false,
 			screen: false,
 			showModal: false,
+            showImageUploader: false,
 			screenAvailable: false,
 			messages: [],
 			message: "",
+            uploadedImages: [],
+            previewImages: [],
+            progress: 0,
 			newmessages: 0,
 			askForUsername: true,
 			username: faker.internet.userName(),
+            dragHighlight : false,
 		}
 		connections = {}
 
@@ -406,12 +417,153 @@ class Meet extends Component {
 		}
 	}
 
+    // addImage = (image) => {
+    //     this.setState(prevState => ({
+    //         images : [...prevState.images, image]
+    //     }))
+    // }
+
+    openImageUloader = () => this.setState({ showImageUploader: true, showModal: false})
+    closeImagesUloader = () => this.setState({ showImageUploader: false, showModal: true})
+    // onFileLoad(){
+
+    // }
+
+    preventDefaults = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+
+    uploadFile = (files) => {
+        console.log(files)
+        // const formData = new FormData();
+        // this.state.previewImages = this.state.previewImages.concat(files);
+        // const formData = new FormData();
+        files.forEach((file) => {
+            this.setState({previewImages:  this.state.previewImages.concat(URL.createObjectURL(file))}, 
+        () =>{console.log(this.state.previewImages)});
+        });
+        // this.setState({
+        // progress: 0,
+        // });
+        // files.forEach((file) => {
+        // formData.append('files', file, file.name);
+        // });
+        // axios
+        // .post('/upload-image', formData, {
+        //     headers: {
+        //     'Content-Type': 'multipart/form-data',
+        //     },
+        //     onUploadProgress: (progressEvent) => {
+        //     this.setState({
+        //         progress: parseInt(
+        //         Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        //         ),
+        //     });
+        //     },
+        // })
+        // .then((res) => {
+        //     this.previewFile(res.data);
+        //     setTimeout(() => {
+        //     this.setState({
+        //         progress: 0,
+        //     });
+        //     }, 3000);
+        // })
+        // .catch((err) => {
+        //     console.log(err);
+        // });
+    };
+    
+    removePreviewImage = (e) => {
+        const index = e.target.getAttribute('index');
+        const images = this.state.previewImages;
+        images.splice(index, 1);
+        this.setState(images);
+    };
+
+    previewFile = (data) => {
+        const images = this.state.previewImages;
+        this.setState({ images: images.concat(data) });
+    };
+
+    handleDrop = (e) => {
+        // this.setState({dragHighlight: false})
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        this.uploadFile(Array.from(files));
+        console.log(this.state.previewImages)
+    };
+
+    handleDragOver = (e) => {
+        // this.setState({dragHighlight: true})
+        e.preventDefault();
+    };
+
+    handleInputByClick = (e) => {
+        this.uploadFile(Array.from(e.target.files));
+    };
+
+    handleDragEnter(){
+        // this.setState({dragHighlight: true})
+    }
+
+    handleDragLeave(){
+        // this.setState({dragHighlight: false})
+    }
+
+    handleSubmit()
+    {
+        this.sumbitPreview()
+    }
+
+
+    sumbitPreview = () => {
+        this.setState({uploadedImages:  this.state.uploadedImages.concat(this.state.previewImages)}, 
+        () =>{console.log(this.state.uploadedImages)});
+
+        this.setState({previewImages: []}, 
+        () =>{console.log(this.state.previewImages)});
+    }
+
+    componentDidMount() {
+        // const drop_region_container = this.drop_region_container.current;
+        // const input = this.file_input.current;
+        // ['dragenter', 'dragover'].forEach((eventName) => {
+        // drop_region_container.addEventListener(eventName, () => {
+        //     drop_region_container.classList.add('highlight');
+        // });
+        // });
+        // ['dragleave', 'drop'].forEach((eventName) => {
+        // drop_region_container.addEventListener(eventName, () => {
+        //     drop_region_container.classList.remove('highlight');
+        // });
+        // });
+
+        // // click to upload
+        // drop_region_container.addEventListener('click', () => {
+        // input.click();
+        // });
+        // console.log("it's listening")
+    }
+    
+
 	handleUsername = (e) => this.setState({ username: e.target.value })
 
 	sendMessage = () => {
 		socket.emit('chat-message', this.state.message, this.state.username)
 		this.setState({ message: "", sender: this.state.username })
 	}
+
+    // sendImages = () => {
+    //     this.state.uploadedImages.forEach((image) => {
+    //         socket.on('image', async image => {
+    //             const buffer = Buffer.from(image);
+    //             await fs.writeFile('/tmp/image', buffer).catch(console.error);
+    //         });
+    //     };
+	// }
 
 	copyUrl = () => {
 		let text = window.location.href
@@ -449,6 +601,7 @@ class Meet extends Component {
 	}
 
 	render() {
+        const { progress } = this.state;
 		if(this.isChrome() === false){
 			return (
 				<div style={{background: "white", width: "30%", height: "auto", padding: "20px", minWidth: "400px",
@@ -515,7 +668,76 @@ class Meet extends Component {
 							<Modal.Footer className="div-send-msg">
 								<Input placeholder="Message" value={this.state.message} onChange={e => this.handleMessage(e)} />
 								<Button variant="contained" color="primary" onClick={this.sendMessage}>Send</Button>
+                                <Button variant="contained" color="primary" onClick={this.openImageUloader}>Add picture</Button>
 							</Modal.Footer>
+						</Modal>
+
+                        <Modal show={this.state.showImageUploader} onHide={this.closeImageUloader} style={{ zIndex: "999999" }}>
+							<Modal.Header closeButton>
+								<Modal.Title>Image uploader</Modal.Title>
+							</Modal.Header>
+							<Modal.Body style={{ overflow: "auto", overflowY: "auto", height: "400px", textAlign: "left" }} >
+                            <div className='App'>
+                                <div className='container'>
+                                    <div
+                                    id='drop-region-container'
+                                    className={'drop-region-container mx-auto'}
+                                    // ref = {this.drop_region_container}
+                                    onDrop = {this.handleDrop}
+                                    onDragOver={this.handleDragOver}
+                                    onDragEnter={this.handleDragEnter}
+                                    onDragLeave={this.handleDragLeave}
+                                    >   
+                                        <div id='drop-region' className='drop-region text-center'>
+                                        <img id='download-btn' src='/Download.png' width='80' alt='' />
+                                        <h2>Drag and Drop or Click to Upload</h2>
+                                        <input
+                                            id='file-input'
+                                            type='file'
+                                            ref = {this.file_input}
+                                            onChange={this.handleInputByClick}
+                                        />
+                                        </div>
+                                    </div>
+                                    {/* <p className='mx-auto'>
+                                        <strong>Uploading Progress</strong>
+                                    </p>
+                                    <div className='progress mx-auto'>
+                                        <div
+                                        id='progress-bar'
+                                        className='progress-bar progress-bar-striped bg-info'
+                                        role='progressbar'
+                                        aria-valuenow='40'
+                                        aria-valuemin='0'
+                                        aria-valuemax='100'
+                                        style={{ width: `${this.state.progress}%` }}
+                                        >
+                                        {progress}%
+                                        </div>
+                                    </div> */}
+                            
+                                    <div id='preview' className='mx-auto'> 
+                                        {this.state.previewImages.map((img, index) => (
+                                        <Fragment key={index}>
+                                            <img src={img} alt='' />
+                                            <button
+                                            className='btn btn-danger btn-block mx-auto'
+                                            onClick={this.removePreviewImage}
+                                            >
+                                            Delete
+                                            </button>
+                                        </Fragment>
+                                        ))}
+                                    </div>
+                                    <Button variant="contained" color="primary" onClick={this.sumbitPreview}>Sumbit</Button>
+                            </div>
+                        </div>
+							</Modal.Body>
+							{/* <Modal.Footer className="div-send-msg">
+								<Input placeholder="Message" value={this.state.message} onChange={e => this.handleMessage(e)} />
+								<Button variant="contained" color="primary" onClick={this.sendMessage}>Send</Button>
+                                <Button variant="contained" color="primary" onClick={this.openPictureUloader}>Add picture</Button>
+							</Modal.Footer> */}
 						</Modal>
 
 						<div className="container">
