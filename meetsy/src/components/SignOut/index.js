@@ -20,11 +20,9 @@ const link = {
 
 
 const SignOutButton = ({ firebase }) => (
-  <Link to={ROUTES.SIGN_IN} style={link} onClick={firebase.doSignOut}>
-    <button style={icon} type="button">
-      <IconSignOut color='white' />
+    <button style={icon} type="button" onClick={firebase.doSignOut}>
+        <IconSignOut color='white'/>
     </button>
-  </Link>
 );
 
 export default withFirebase(SignOutButton);
