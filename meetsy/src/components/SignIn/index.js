@@ -65,7 +65,7 @@ const Container = styled.div`
      align-items: center;
      p 
      {
-       color: #fff !important;
+       color: #fff;
      }
 `;
 const StyledInput = styled.input`
@@ -75,6 +75,7 @@ const StyledInput = styled.input`
  height: 40px;
  border: none;
  margin: 0.5rem 0;
+ color: #393c41;
  background-color: #f5f5f5;
  box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
  border-radius: 32px;
@@ -185,6 +186,5 @@ const SignInForm = compose(
 
 const condition = authUser => !authUser;
 export default withAuthorization(condition)(SignInPage);
-
 
 export { SignInForm, SignInLink };

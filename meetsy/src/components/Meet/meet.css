@@ -2,7 +2,7 @@ body {
     margin: 0;
 }
 p{
-    color: black !important;
+    color: black;
 }
 
 .flex-container {
