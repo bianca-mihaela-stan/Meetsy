@@ -40,3 +40,7 @@ p{
     width: 100%;
     height: auto;
 }
+
+.btn-down > .MuiIconButton-root:nth-of-type(1) > .MuiIconButton-label {
+    color: #c70000;
+}

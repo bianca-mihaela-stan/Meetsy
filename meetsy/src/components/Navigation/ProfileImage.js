@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         paddingTop: '15%',
         paddingBottom: '80px',
-        
+
     },
     title: {
         fontSize: 16,
@@ -29,11 +29,11 @@ const styles = StyleSheet.create({
         color: '#A4A6B3',
         textDecoration: 'none'
     },
-    imageCtn : {
-      borderRadius: '50%',
-      width: '35px',
-      height: '35px',
-      overflow: 'hidden'
+    imageCtn: {
+        borderRadius: '50%',
+        width: '35px',
+        height: '35px',
+        overflow: 'hidden'
     },
     image: {
         height: '100%',
@@ -41,15 +41,16 @@ const styles = StyleSheet.create({
     }
 });
 
-function ProfileImage(props){
-    const {path, content,title,size,...otherProps} = props;
+function ProfileImage(props) {
+    const { path, content, title, size, ...otherProps } = props;
     const Content = content;
     const Path = path;
     return (
-        <Row className={css(styles.container)}  vertical="center">
-        <Link to={Path} className={css(styles.imageCtn)} style = {{width: {size}, height: {size}}}><img className={css(styles.image)} src={Content}/></Link>
-
-        </Row>
+        <Link to={Path} className={css(styles.imageCtn)} style={{ width: { size }, height: { size } }}>
+            <Row className={css(styles.container)} vertical="center">
+                <img className={css(styles.image)} src={Content} />
+            </Row>
+        </Link>
     );
 }
 

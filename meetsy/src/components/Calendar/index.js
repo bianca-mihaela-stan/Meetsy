@@ -1,5 +1,6 @@
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
+import { withAuthorization } from '../Session';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar.css';
 
@@ -26,4 +27,5 @@ const MyCalendar = props => (
     </div>
 )
 
-export default MyCalendar;
+const condition = authUser => !!authUser;
+export default withAuthorization(condition)(MyCalendar);
