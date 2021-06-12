@@ -4,10 +4,13 @@ import './index.css';
 import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
-import Firebase, { FirebaseContext } from './components/Firebase';
+import  { FirebaseContext } from './components/Firebase';
+import SingletonFactory from './components/Firebase';
 
 
-var firebase = new Firebase();
+var firebase = SingletonFactory.getInstance();
+var firebase2 = SingletonFactory.getInstance();
+console.log(firebase === firebase2);
 
 ReactDOM.render(
   <FirebaseContext.Provider value={firebase}>

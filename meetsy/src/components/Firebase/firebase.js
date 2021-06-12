@@ -26,7 +26,9 @@ const firebaseConfig = {
 // firebase.initializeApp(firebaseConfig);
 
 
-class Firebase {
+var SingletonFactory = (function() {
+
+  class Firebase {
     constructor() {
       firebase.initializeApp(firebaseConfig);
 
@@ -79,5 +81,15 @@ class Firebase {
      teams = () => this.db.collection('teams');
 
 }
-
-export default Firebase;
+  var instance;
+  return {
+    getInstance: function(){
+      if(!instance){
+        instance = new Firebase();
+        delete instance.constructor;
+      }
+      return instance;
+    }
+  }
+})();
+export default SingletonFactory;

@@ -26,6 +26,7 @@ import TeamComponent from '../Team/TeamComponent';
 import TeamCollection from '../Team/TeamCollection';
 import {compose} from 'recompose';
 import LoadingScreen from 'react-loading-screen';
+import CallError from '../CallError';
 const styles = StyleSheet.create({
 
   content: {
@@ -116,6 +117,7 @@ class App extends Component {
             <Route path={ROUTES.USERS} component={UserList} />
             <Route path={ROUTES.USER_DETAILS} component={UserItem} />
             <Route path={ROUTES.SHOW_TEAMS} component={TeamCollection}/>
+            <Route path={ROUTES.CALLERROR} component={CallError}/>
             <Route path="/meet/:url" component={Meet} />
             <Route path="/showteam/:teamId" component={TeamComponent} />
             {/* <Route path={ROUTES.TEAM} component={TeamComponent}/> */}

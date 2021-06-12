@@ -7,6 +7,9 @@ import TeamItem from './TeamItem';
 import Grid from "@material-ui/core/Grid";
 import styled from 'styled-components';
 import { COLORS } from '../../constants/designConstants';
+import ReactModal from 'react-modal';
+import Modal from 'react-modal';
+import Popup from 'reactjs-popup';
 
 class TeamCollection extends Component {
   constructor(props) {
@@ -21,7 +24,8 @@ class TeamCollection extends Component {
       name: '',
       loading: false,
       teams: [],
-      description: ''
+      description: '',
+      modalIsOpen: false
     };
   }
   // este chemata imediata ce componenta este mounted (este adaugata in DOM)
@@ -61,7 +65,7 @@ class TeamCollection extends Component {
     // apelam metoda asta ca sa incetam sa ascultam schimbarile colectiei din bd
     this.unsubscribe();
   }
-
+  
   /// ATENTIE! Trebuie sa actualizam valoarea inputului
   onChangeText = event => {
     this.setState({ name: event.target.value });
@@ -96,6 +100,10 @@ class TeamCollection extends Component {
       });
      
   };
+  /// FOR MODAL
+  openModal = () => { this.setState({modalIsOpen: true});}
+
+  closeModal = () => { this.setState({modalIsOpen: false}); }
 
   render() {
     const { name, teams, loading, description } = this.state;
@@ -127,26 +135,46 @@ class TeamCollection extends Component {
 
             {/*onCreateTeam trebuie sa primeasca si event ca sa putem
           preveni actiunea default a submisiei  */}
-            <form style={form}
-              onSubmit={event =>
-                this.onCreateTeam(event, authUser)
-              }
-            >
-              <h4 style={{'marginBottom': '10px'}}>Create a new course</h4>
-              <StyledInput
-                type="text"
-                value={name}
-                placeholder = 'Name'
-                onChange={this.onChangeText}
-              />
-              <StyledTextArea
-                type="text"
-                value={description}
-                placeholder = 'Description'
-                onChange={this.onChangeDescription}
-              />
-              <StyledButton type="submit">Create Team</StyledButton>
-            </form> </div>
+      
+
+           {/* <Popup
+    trigger={<button> Open Modal </button>}
+    modal
+  >
+    {close => ( */}
+      <form style={form}
+      onSubmit={event =>
+        this.onCreateTeam(event, authUser)
+      }
+    >
+      <h4 style={{'marginBottom': '10px'}}>Create a new course</h4>
+      <StyledInput
+        type="text"
+        value={name}
+        placeholder = 'Name'
+        onChange={this.onChangeText}
+      />
+      <StyledTextArea
+        type="text"
+        value={description}
+        placeholder = 'Description'
+        onChange={this.onChangeDescription}
+      />
+      <StyledButton type="submit">Create Team</StyledButton>
+      
+      {/* <button
+            className="button"
+            onClick={() => {
+              console.log('modal closed ');
+              close();
+            }}
+          >
+            close modal
+          </button> */}
+    </form>
+    {/* )}
+  </Popup> */}
+             </div>
         )}
       </AuthUserContext.Consumer>
     );
@@ -210,6 +238,7 @@ const StyledTextArea = styled.textarea`
   // border: 3px solid rgb(62,106,225,0.7);
  }
 `;
+
 const form = {
     marginTop: '10%',
     marginRight: 'auto !important',
@@ -221,7 +250,7 @@ const form = {
     display: 'flex',
     borderRadius: '8px',
     minWidth: '300px',
-    maxWidth: '500px',
+    maxWidth: '600px',
     flexDirection: 'column',
     alignContent: 'center',
     justifyContent: 'right',

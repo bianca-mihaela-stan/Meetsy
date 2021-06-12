@@ -5,6 +5,7 @@ import { withFirebase } from '../Firebase';
 import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import IconSignOut from '../../assets/icon-sign-out.js';
+import Modal from 'react-modal';
 
 const icon = {
   height: '23px',

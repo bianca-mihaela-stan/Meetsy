@@ -13,9 +13,10 @@ import ScreenShareIcon from '@material-ui/icons/ScreenShare'
 import StopScreenShareIcon from '@material-ui/icons/StopScreenShare'
 import CallEndIcon from '@material-ui/icons/CallEnd'
 import ChatIcon from '@material-ui/icons/Chat'
-
+import { withFirebase } from '../Firebase';
 import { message } from 'antd'
 import 'antd/dist/antd.css'
+import {compose} from 'recompose';
 
 import { Row } from 'simple-flexbox'
 import Modal from 'react-bootstrap/Modal'
@@ -54,7 +55,9 @@ class Meet extends Component {
 			message: "",
 			newmessages: 0,
 			askForUsername: true,
-			username: faker.internet.userName(),
+			username: this.props.firebase.authUser.username,
+			userId: this.props.firebase.authUser.userId
+		
 		}
 		connections = {}
 
@@ -278,13 +281,18 @@ class Meet extends Component {
 		socket.on("connect_error", (err) => {
 			console.log(`connect_error due to ${err.message}`);
 		});
+		
 		socket.on('signal', this.gotMessageFromServer)
 
 		socket.on('connect', () => {
 			console.log('S-a realizat conexiunea!')
-			socket.emit('join-call', window.location.href)
+			console.log("Id: ", this.state.userId);
+			socket.emit('join-call', window.location.href, this.state.userId)
 			socketId = socket.id
 
+			socket.on("already-in-call-error", () => {
+				 window.location.href = ROUTES.CALLERROR;
+			})
 			socket.on('chat-message', this.addMessage)
 
 			socket.on('user-left', (id) => {
@@ -299,7 +307,6 @@ class Meet extends Component {
 			})
 
 			socket.on('user-joined', (id, clients) => {
-				console.log('User-ul a intrat!')
 				clients.forEach((socketListId) => {
 					connections[socketListId] = new RTCPeerConnection(peerConnectionConfig)
 					// Wait for their ice candidate       
@@ -324,7 +331,7 @@ class Meet extends Component {
 
 							let css = {
 								minWidth: cssMesure.minWidth, minHeight: cssMesure.minHeight, maxHeight: "100%", margin: "10px",
-								borderStyle: "solid", borderRadius: "25px", objectFit: "cover"
+								borderStyle: "solid", borderRadius: "15px", objectFit: "cover"
 							}
 							for (let i in css) video.style[i] = css[i]
 
@@ -484,7 +491,7 @@ class Meet extends Component {
 
 						<div style={{ justifyContent: "center", textAlign: "center", paddingTop: "40px" }}>
 							<video id="my-video" ref={this.localVideoref} autoPlay muted style={{
-								borderStyle: "solid", borderColor: "#bdbdbd", objectFit: "fill", width: "60%", height: "30%"
+								borderStyle: "solid", borderRadius: "15px", borderColor: "#bdbdbd", objectFit: "fill", width: "60%", height: "30%"
 							}}></video>
 						</div>
 					</div>
@@ -549,7 +556,7 @@ class Meet extends Component {
 
 							<Row id="main" className="flex-container" style={{ margin: 0, padding: 0 }}>
 								<video id="my-video" ref={this.localVideoref} autoPlay muted style={{
-									borderStyle: "solid", borderRadius: "25px", margin: "10px", objectFit: "cover",
+									borderStyle: "solid", borderRadius: "15px", margin: "10px", objectFit: "cover",
 									width: "100%", height: "100%"
 								}}></video>
 								{/*
@@ -574,4 +581,4 @@ class Meet extends Component {
 }
 
 const condition = authUser => !!authUser;
-export default withAuthorization(condition)(Meet);
+export default compose(withFirebase, withAuthorization(condition))(Meet);
