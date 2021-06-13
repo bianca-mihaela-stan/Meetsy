@@ -26,6 +26,7 @@ sanitizeString = (str) => {
 
 connections = {}
 messages = {}
+images = {}
 timeOnline = {}
 
 io.on('connection', (socket) => {
@@ -80,6 +81,34 @@ io.on('connection', (socket) => {
 
             for (let a = 0; a < connections[key].length; ++a) {
                 io.to(connections[key][a]).emit("chat-message", data, sender, socket.id)
+            }
+        }
+    })
+
+    socket.on('image', (data, sender) => {
+        data = sanitizeString(data)
+        sender = sanitizeString(sender)
+
+        var key
+        var ok = false
+        for (const [k, v] of Object.entries(connections)) {
+            for (let a = 0; a < v.length; ++a) {
+                if (v[a] === socket.id) {
+                    key = k
+                    ok = true
+                }
+            }
+        }
+
+        if (ok === true) {
+            if (images[key] === undefined) {
+                images[key] = []
+            }
+            images[key].push({ "sender": sender, "data": data, "socket-id-sender": socket.id })
+            console.log("image", key, ":", sender, data)
+
+            for (let a = 0; a < connections[key].length; ++a) {
+                io.to(connections[key][a]).emit("image", data, sender, socket.id)
             }
         }
     })

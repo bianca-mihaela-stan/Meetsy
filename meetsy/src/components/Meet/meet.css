@@ -41,3 +41,11 @@ p{
     height: auto;
 }
 
+.chat-image{
+    width: 50%;
+    height: auto;
+}
+
+.black{
+    color: black;
+}

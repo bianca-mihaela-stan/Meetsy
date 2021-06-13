@@ -20,8 +20,10 @@ import './drop.scss';
 
 import { Row } from 'simple-flexbox'
 import Modal from 'react-bootstrap/Modal'
+import Image from 'react-bootstrap/Image'
 import 'bootstrap/dist/css/bootstrap.css'
 import "./meet.css"
+import { green } from '@material-ui/core/colors';
 
 const server_url = "http://localhost:3001"
 
@@ -43,7 +45,7 @@ class Meet extends Component {
 		super(props)
 
 		this.localVideoref = React.createRef()
-        // this.file_input = React.createRef()
+        this.file_input = React.createRef()
         // this.drop_region_container = React.createRef()
 		this.videoAvailable = false
 		this.audioAvailable = false
@@ -59,7 +61,8 @@ class Meet extends Component {
 			message: "",
             uploadedImages: [],
             previewImages: [],
-            progress: 0,
+            images: [],
+            greenDrop: false,
 			newmessages: 0,
 			askForUsername: true,
 			username: faker.internet.userName(),
@@ -289,12 +292,21 @@ class Meet extends Component {
 		  });
 		socket.on('signal', this.gotMessageFromServer)
 
+
 		socket.on('connect', () => {
 			console.log('S-a realizat conexiunea!')
 			socket.emit('join-call', window.location.href)
 			socketId = socket.id
 
-			socket.on('chat-message', this.addMessage)
+			socket.on('chat-message',  (data, sender, socketIdSender) => {
+                console.log("socket.on(message)")
+                this.addMessage(data, sender, socketIdSender)
+            })
+
+            socket.on('image', (data, sender, socketIdSender) => {
+                console.log("socket.on(image)")
+                this.addImage(data, sender, socketIdSender)
+            })
 
 			socket.on('user-left', (id) => {
 				let video = document.querySelector(`[data-socket="${id}"]`)
@@ -409,13 +421,25 @@ class Meet extends Component {
 	handleMessage = (e) => this.setState({ message: e.target.value })
 
 	addMessage = (data, sender, socketIdSender) => {
+        console.log("addMessage")
 		this.setState(prevState => ({
-			messages: [...prevState.messages, { "sender": sender, "data": data }],
+			messages: [...prevState.messages, { "sender": sender, "data": data, "type": "txt" }],
 		}))
 		if (socketIdSender !== socketId) {
 			this.setState({ newmessages: this.state.newmessages + 1 })
 		}
 	}
+
+    addImage = (image, sender, socketIdSender) => {
+        console.log("addImage")
+        this.setState(prevState => ({
+            messages: [...prevState.messages, {'sender': sender, "data": image, "type": "image"}],
+        }))
+        if (socketIdSender !== socketId) {
+			this.setState({ newmessages: this.state.newmessages + 1 })
+		}
+        console.log(this.state.images)
+    }
 
     // addImage = (image) => {
     //     this.setState(prevState => ({
@@ -424,10 +448,7 @@ class Meet extends Component {
     // }
 
     openImageUloader = () => this.setState({ showImageUploader: true, showModal: false})
-    closeImagesUloader = () => this.setState({ showImageUploader: false, showModal: true})
-    // onFileLoad(){
-
-    // }
+    closeImageUloader = () => this.setState({ showImageUploader: false, showModal: true})
 
     preventDefaults = (e) => {
         e.preventDefault();
@@ -441,39 +462,9 @@ class Meet extends Component {
         // this.state.previewImages = this.state.previewImages.concat(files);
         // const formData = new FormData();
         files.forEach((file) => {
-            this.setState({previewImages:  this.state.previewImages.concat(URL.createObjectURL(file))}, 
+            this.setState({previewImages:  this.state.previewImages.concat(file)}, 
         () =>{console.log(this.state.previewImages)});
         });
-        // this.setState({
-        // progress: 0,
-        // });
-        // files.forEach((file) => {
-        // formData.append('files', file, file.name);
-        // });
-        // axios
-        // .post('/upload-image', formData, {
-        //     headers: {
-        //     'Content-Type': 'multipart/form-data',
-        //     },
-        //     onUploadProgress: (progressEvent) => {
-        //     this.setState({
-        //         progress: parseInt(
-        //         Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        //         ),
-        //     });
-        //     },
-        // })
-        // .then((res) => {
-        //     this.previewFile(res.data);
-        //     setTimeout(() => {
-        //     this.setState({
-        //         progress: 0,
-        //     });
-        //     }, 3000);
-        // })
-        // .catch((err) => {
-        //     console.log(err);
-        // });
     };
     
     removePreviewImage = (e) => {
@@ -493,29 +484,42 @@ class Meet extends Component {
         e.preventDefault();
         const files = e.dataTransfer.files;
         this.uploadFile(Array.from(files));
-        console.log(this.state.previewImages)
+        this.setState({
+            greenDrop: false
+        })
     };
 
     handleDragOver = (e) => {
         // this.setState({dragHighlight: true})
         e.preventDefault();
+        this.setState({
+            greenDrop: true
+        })
     };
 
     handleInputByClick = (e) => {
         this.uploadFile(Array.from(e.target.files));
     };
 
-    handleDragEnter(){
-        // this.setState({dragHighlight: true})
+    handleDragEnter = () =>{
+        this.setState({
+            greenDrop: true
+        })
     }
 
-    handleDragLeave(){
-        // this.setState({dragHighlight: false})
+    handleDragLeave = () =>{
+        this.setState({
+            greenDrop: false
+        })
     }
 
-    handleSubmit()
+    handleSubmit = () =>
     {
         this.sumbitPreview()
+    }
+
+    handleClick = (e) => {
+        this.file_input.click();
     }
 
 
@@ -526,44 +530,50 @@ class Meet extends Component {
         this.setState({previewImages: []}, 
         () =>{console.log(this.state.previewImages)});
     }
-
-    componentDidMount() {
-        // const drop_region_container = this.drop_region_container.current;
-        // const input = this.file_input.current;
-        // ['dragenter', 'dragover'].forEach((eventName) => {
-        // drop_region_container.addEventListener(eventName, () => {
-        //     drop_region_container.classList.add('highlight');
-        // });
-        // });
-        // ['dragleave', 'drop'].forEach((eventName) => {
-        // drop_region_container.addEventListener(eventName, () => {
-        //     drop_region_container.classList.remove('highlight');
-        // });
-        // });
-
-        // // click to upload
-        // drop_region_container.addEventListener('click', () => {
-        // input.click();
-        // });
-        // console.log("it's listening")
-    }
     
 
 	handleUsername = (e) => this.setState({ username: e.target.value })
 
 	sendMessage = () => {
+        console.log("sendMessage")
 		socket.emit('chat-message', this.state.message, this.state.username)
 		this.setState({ message: "", sender: this.state.username })
 	}
 
-    // sendImages = () => {
-    //     this.state.uploadedImages.forEach((image) => {
-    //         socket.on('image', async image => {
-    //             const buffer = Buffer.from(image);
-    //             await fs.writeFile('/tmp/image', buffer).catch(console.error);
-    //         });
-    //     };
-	// }
+    getBase64 = file => {
+        return new Promise(resolve => {
+          let fileInfo;
+          let baseURL = "";
+          // Make new FileReader
+          let reader = new FileReader();
+    
+          // Convert the file to base64 text
+          reader.readAsDataURL(file);
+    
+          // on reader load somthing...
+          reader.onload = () => {
+            // Make a fileInfo Object
+            console.log("Called", reader);
+            baseURL = reader.result;
+            console.log(baseURL);
+            resolve(baseURL);
+          };
+          console.log(fileInfo);
+        });
+      };
+
+    sendImages = () => {
+        console.log(this.state.previewImages)
+        console.log(this.state.previewImages.length)
+        console.log(this.state.previewImages.length > 0)
+        if(this.state.previewImages.length>0){
+            console.log("sendImages")
+            this.state.previewImages.forEach((image) => {
+                socket.emit('image', URL.createObjectURL(image), this.state.username)
+            })
+            this.setState({previewImages: [], sender: this.state.username})
+        }
+    }
 
 	copyUrl = () => {
 		let text = window.location.href
@@ -599,6 +609,22 @@ class Meet extends Component {
 		// return matchChrome !== null || matchFirefox !== null
 		return matchChrome !== null
 	}
+
+    renderItem(item, index)
+    {
+        if(item.type=="txt")
+        {
+            return <div key={index} style={{textAlign: "left"}}>
+                    <p style={{ wordBreak: "break-all", color: "black" }}><b>{item.sender}</b>: {item.data}</p>
+                    </div>
+        }
+        else if (item.type == "image")
+        {
+            return <Fragment key={index}>
+                <p style={{ wordBreak: "break-all", color: "black"}}><b>{item.sender}</b>: <br></br><Image src={item.data} className="chat-image"/></p>
+            </Fragment>
+        }
+    }
 
 	render() {
         const { progress } = this.state;
@@ -656,14 +682,12 @@ class Meet extends Component {
 
 						<Modal show={this.state.showModal} onHide={this.closeChat} style={{ zIndex: "999999" }}>
 							<Modal.Header closeButton>
-								<Modal.Title>Chat Room</Modal.Title>
+								<Modal.Title style = {{color: "black"}}>Chat Room</Modal.Title>
 							</Modal.Header>
 							<Modal.Body style={{ overflow: "auto", overflowY: "auto", height: "400px", textAlign: "left" }} >
 								{this.state.messages.length > 0 ? this.state.messages.map((item, index) => (
-									<div key={index} style={{textAlign: "left"}}>
-										<p style={{ wordBreak: "break-all" }}><b>{item.sender}</b>: {item.data}</p>
-									</div>
-								)) : <p>No message yet</p>}
+                                    this.renderItem(item, index)
+								)) : <p style = {{color: "black"}}>No message yet</p>}
 							</Modal.Body>
 							<Modal.Footer className="div-send-msg">
 								<Input placeholder="Message" value={this.state.message} onChange={e => this.handleMessage(e)} />
@@ -673,20 +697,20 @@ class Meet extends Component {
 						</Modal>
 
                         <Modal show={this.state.showImageUploader} onHide={this.closeImageUloader} style={{ zIndex: "999999" }}>
-							<Modal.Header closeButton>
-								<Modal.Title>Image uploader</Modal.Title>
+							<Modal.Header closeButton onclick={this.closeImagesUloader}>
+								<Modal.Title style = {{color: "black"}}>Image uploader</Modal.Title>
 							</Modal.Header>
 							<Modal.Body style={{ overflow: "auto", overflowY: "auto", height: "400px", textAlign: "left" }} >
                             <div className='App'>
-                                <div className='container'>
+                                <div className='drop-container'>
                                     <div
                                     id='drop-region-container'
                                     className={'drop-region-container mx-auto'}
-                                    // ref = {this.drop_region_container}
                                     onDrop = {this.handleDrop}
                                     onDragOver={this.handleDragOver}
                                     onDragEnter={this.handleDragEnter}
-                                    onDragLeave={this.handleDragLeave}
+                                    onDragLeave={this.handleDragLeave} 
+                                    onClick = {this.handleClick}
                                     >   
                                         <div id='drop-region' className='drop-region text-center'>
                                         <img id='download-btn' src='/Download.png' width='80' alt='' />
@@ -694,32 +718,16 @@ class Meet extends Component {
                                         <input
                                             id='file-input'
                                             type='file'
-                                            ref = {this.file_input}
+                                            ref = {input => this.file_input = input}
                                             onChange={this.handleInputByClick}
                                         />
                                         </div>
                                     </div>
-                                    {/* <p className='mx-auto'>
-                                        <strong>Uploading Progress</strong>
-                                    </p>
-                                    <div className='progress mx-auto'>
-                                        <div
-                                        id='progress-bar'
-                                        className='progress-bar progress-bar-striped bg-info'
-                                        role='progressbar'
-                                        aria-valuenow='40'
-                                        aria-valuemin='0'
-                                        aria-valuemax='100'
-                                        style={{ width: `${this.state.progress}%` }}
-                                        >
-                                        {progress}%
-                                        </div>
-                                    </div> */}
                             
                                     <div id='preview' className='mx-auto'> 
                                         {this.state.previewImages.map((img, index) => (
                                         <Fragment key={index}>
-                                            <img src={img} alt='' />
+                                            <img src={URL.createObjectURL(img)} alt='' />
                                             <button
                                             className='btn btn-danger btn-block mx-auto'
                                             onClick={this.removePreviewImage}
@@ -729,15 +737,12 @@ class Meet extends Component {
                                         </Fragment>
                                         ))}
                                     </div>
-                                    <Button variant="contained" color="primary" onClick={this.sumbitPreview}>Sumbit</Button>
                             </div>
                         </div>
 							</Modal.Body>
-							{/* <Modal.Footer className="div-send-msg">
-								<Input placeholder="Message" value={this.state.message} onChange={e => this.handleMessage(e)} />
-								<Button variant="contained" color="primary" onClick={this.sendMessage}>Send</Button>
-                                <Button variant="contained" color="primary" onClick={this.openPictureUloader}>Add picture</Button>
-							</Modal.Footer> */}
+							<Modal.Footer className="div-send-msg">
+                            <Button variant="contained" color="primary" onClick={this.sendImages}>Sumbit</Button>
+							</Modal.Footer>
 						</Modal>
 
 						<div className="container">

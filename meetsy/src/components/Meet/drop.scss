@@ -1,7 +1,8 @@
 .App {
-    .container {
+    .drop-container {
       text-align: center;
-      min-height: 100px;
+      width: 100%;
+      height: auto;
       padding-bottom: 3em;
       .drop-region-container {
         margin-top: 3em;
