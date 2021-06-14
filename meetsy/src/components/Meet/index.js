@@ -94,8 +94,8 @@ class Meet extends Component {
 
 	getMedia = () => {
 		this.setState({
-			video: false,  // this.videoAvailable,
-			audio: false   // this.audioAvailable
+			video: this.videoAvailable,
+			audio: this.audioAvailable
 		}, () => {
 			this.getUserMedia()
 			this.connectToSocketServer()
