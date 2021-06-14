@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import io from 'socket.io-client'
-import faker from "faker"
 import { AuthUserContext, withAuthorization } from '../Session';
 import * as ROUTES from '../../constants/routes';
 
@@ -54,7 +53,7 @@ class Meet extends Component {
 			message: "",
 			newmessages: 0,
 			askForUsername: true,
-			username: faker.internet.userName(),
+			username: props.firebase.authUser.username
 		}
 		connections = {}
 
@@ -137,8 +136,8 @@ class Meet extends Component {
 
 		stream.getTracks().forEach(track => track.onended = () => {
 			this.setState({
-				video: false,
-				audio: false,
+				video: !this.state.video,
+				audio: !this.state.audio,
 			}, () => {
 				try {
 					let tracks = this.localVideoref.current.srcObject.getTracks()
@@ -428,8 +427,8 @@ class Meet extends Component {
 			textArea.focus()
 			textArea.select()
 			try {
-				document.execCommand('copy')
-				message.success("Link copied to clipboard!")
+				document.execCommand('copy');
+				message.success("Link copied to clipboard!");
 			} catch (err) {
 				message.error("Failed to copy")
 			}
@@ -483,9 +482,20 @@ class Meet extends Component {
 						</div>
 
 						<div style={{ justifyContent: "center", textAlign: "center", paddingTop: "40px" }}>
-							<video id="my-video" ref={this.localVideoref} autoPlay muted style={{
+							<video id="my-video" ref={this.localVideoref} autoPlay={this.state.video} muted={this.state.audio} style={{
 								borderStyle: "solid", borderColor: "#bdbdbd", objectFit: "fill", width: "60%", height: "30%"
 							}}></video>
+						</div>
+
+						<div style={{ justifyContent: "center", textAlign: "center" }}>
+							<IconButton style={{ color: "#424242" }} onClick={this.handleAudio}>
+								{this.state.audio === true ? <MicIcon /> : <MicOffIcon />}
+							</IconButton>
+
+							<IconButton style={{ color: "#424242" }} onClick={this.handleVideo}>
+								{(this.state.video === true) ? <VideocamIcon /> : <VideocamOffIcon />}
+							</IconButton>
+
 						</div>
 					</div>
 					:
@@ -528,7 +538,7 @@ class Meet extends Component {
 											: { textAlign: "left" }
 									}>
 										<p style={{ wordBreak: "break-all", color: "black" }}><b>{
-											item.sender !== this.state.username ? item.sender : "Me"}</b>: {item.data}</p>
+											item.sender !== this.state.username ? item.sender : (this.state.video ? "true" : "false")}</b>: {item.data}</p>
 									</div>
 								)) : <p>No message yet</p>}
 							</Modal.Body>
@@ -548,7 +558,7 @@ class Meet extends Component {
 							</div>
 
 							<Row id="main" className="flex-container" style={{ margin: 0, padding: 0 }}>
-								<video id="my-video" ref={this.localVideoref} autoPlay muted style={{
+								<video id="my-video" ref={this.localVideoref} autoPlay={this.state.video} muted={this.state.audio} style={{
 									borderStyle: "solid", borderRadius: "25px", margin: "10px", objectFit: "cover",
 									width: "100%", height: "100%"
 								}}></video>

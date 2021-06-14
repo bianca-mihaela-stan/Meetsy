@@ -8,6 +8,8 @@ import DropdownComponent from '../Dropdown/index.js';
 import { useHistory } from "react-router-dom";
 import { ACCOUNT } from '../../constants/routes';
 import './header.css';
+
+
 const useStyles = createUseStyles((theme) => ({
 
     container: {
@@ -48,28 +50,27 @@ const useStyles = createUseStyles((theme) => ({
             marginRight: 0
         }
     },
-    imageCtn : {
+    imageCtn: {
         borderRadius: '50%',
         width: '35px',
         height: '35px',
         overflow: 'hidden',
         margin: '0 10px'
-      },
-      image: {
-          height: '100%',
-          width: 'auto'
-      }
+    },
+    image: {
+        height: '100%',
+        width: 'auto'
+    }
 }));
 
 function HeaderComponent() {
     const theme = useTheme();
     let history = useHistory();
     const classes = useStyles({ theme });
-    
-    function onSettingsClick() 
-{
-    history.push(ACCOUNT);
-}
+
+    function onSettingsClick() {
+        history.push(ACCOUNT);
+    }
 
     return (
         <Row className={classes.container} vertical='center' horizontal='space-between'>
@@ -113,12 +114,12 @@ function HeaderComponent() {
                     label={
                         <>
                             <span className={classes.name}>Taylor Hill</span>
-                            <div className = {classes.imageCtn}>
-                            <img
-                                src='https://hips.hearstapps.com/harpersbazaaruk.cdnds.net/17/03/1484755929-taylor-hill.jpg'
-                                alt='avatar'
-                                className={classes.image}
-                            />
+                            <div className={classes.imageCtn}>
+                                <img
+                                    src='https://hips.hearstapps.com/harpersbazaaruk.cdnds.net/17/03/1484755929-taylor-hill.jpg'
+                                    alt='avatar'
+                                    className={classes.image}
+                                />
                             </div>
                         </>
                     }

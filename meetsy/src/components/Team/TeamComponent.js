@@ -7,12 +7,16 @@ import { AuthUserContext } from '../Session';
 import { withRouter } from "react-router";
 import { compose } from 'recompose';
 
+const inputField = {
+  color: 'black'
+}
+
 class TeamComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
       editMode: false,
-      editText:"",
+      editText: "",
       addMemberMode: false,
       userEmail: "",
       loading: false,
@@ -22,32 +26,33 @@ class TeamComponent extends Component {
       condition: null
     };
     console.log(props);
-   
+
 
   }
 
   componentDidMount() {
     const { match: { params } } = this.props;
-    this.setState({loadingTeam: true});
-   
+    this.setState({ loadingTeam: true });
+
     this.unsubscribe = this.props.firebase
       .team(params.teamId)
       .onSnapshot(snapshot => {
-          if(snapshot.exists){
-        const tempTeam = snapshot.data();
-        tempTeam.uid = params.teamId;
-        
-        this.setState({
-          team: tempTeam,
-          loadingTeam: false,
-          condition: id => id === this.state.team.ownerId
-        });
-        this.setState({
+        if (snapshot.exists) {
+          const tempTeam = snapshot.data();
+          tempTeam.uid = params.teamId;
+
+          this.setState({
+            team: tempTeam,
+            loadingTeam: false,
+            condition: id => id === this.state.team.ownerId
+          });
+          this.setState({
             editText: this.state.team.name
-        });
-        this.onListenForMembers();}
+          });
+          this.onListenForMembers();
+        }
       });
-    
+
   }
   onListenForMembers = () => {
     this.setState({ loading: true });
@@ -55,7 +60,7 @@ class TeamComponent extends Component {
     this.unsubscribe = this.props.firebase.users()
       .onSnapshot(snapshot => {
         let members = [];
-        console.log("here!");
+        console.log("here in TeamComponent.js!");
         snapshot.forEach(doc => {
           if (this.state.team.members.includes(doc.id))
             members.push({ ...doc.data(), uid: doc.id })
@@ -74,6 +79,11 @@ class TeamComponent extends Component {
     this.unsubscribe();
   }
   onRemoveMember = (team, memberId) => {
+
+    if (this.props.firebase.authUser.uid === memberId) {
+      return;
+    }
+
     const { members } = this.state;
     var currentMember = members.find(u => u.userId == memberId);
     var oldTeams = currentMember.teams;
@@ -87,33 +97,38 @@ class TeamComponent extends Component {
     })
   }
   onLeaveTeam = (team, memberId) => {
-    const {members} = this.state;
-    this.onRemoveMember(team,memberId)
-    if(members.length == 1){
-       this.onRemoveTeam(team.uid);
+    const { members } = this.state;
+    this.onRemoveMember(team, memberId)
+    if (members.length == 1) {
+      this.onRemoveTeam(team.uid);
     }
   }
   onAddMember = (team) => {
     const { members } = this.state;
     this.props.firebase.userByEmail(this.state.userEmail).get().then(query => {
-     query.forEach(doc => { if (doc.exists) {
-        const user = doc.data();
-        console.log(user, typeof (user));
-        var newMembers = members.map(u => u.userId);
-        newMembers.push(user.userId)
-        this.props.firebase.team(team.uid).update({
-          members: newMembers
-        });
-        var newTeams = user.teams;
-        newTeams.push(team.uid);
-        this.props.firebase.user(user.userId).update({
-          teams: newTeams
-        })
-      }
-      else {
-        console.log("No such user!");
-      }
-    })}
+      query.forEach(doc => {
+        if (doc.exists) {
+          const user = doc.data();
+          console.log(user, typeof (user));
+          var newMembers = members.map(u => u.userId);
+          newMembers.push(user.userId)
+          this.props.firebase.team(team.uid).update({
+            members: newMembers
+          });
+          var newTeams = user.teams;
+
+          if (!newTeams.includes(team.uid)) {
+            newTeams.push(team.uid);
+          }
+          this.props.firebase.user(user.userId).update({
+            teams: newTeams
+          })
+        }
+        else {
+          console.log("No such user!");
+        }
+      })
+    }
     ).catch((error) => {
       console.log("Error getting document:", error);
     });
@@ -126,8 +141,27 @@ class TeamComponent extends Component {
   };
 
   onRemoveTeam = uid => {
+
     this.props.firebase.team(uid).delete();
-    //trebuie sa redirectionaam userul
+
+    this.props.firebase.users()
+      .onSnapshot(snapshot => {
+        snapshot.forEach(doc => {
+          // daca userul apartine team-ului cu uid
+          if (doc.data().teams.includes(uid)) {
+            // retinem team-urile de acum
+            var oldTeams = doc.data().teams;
+            console.log("filtrate", doc.data().userId, oldTeams.filter(id => id != uid));
+            // facem update la bd cu team-urile filtrate
+            this.props.firebase.user(doc.data().userId).update({
+              teams: oldTeams.filter(id => id != uid)
+            });
+          }
+        }
+        );
+      });
+
+    //trebuie sa redirectionam userul
     this.props.history.push('/team');
   };
 
@@ -159,98 +193,100 @@ class TeamComponent extends Component {
   render() {
     const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition } = this.state;
     return (
-        <AuthUserContext.Consumer>
-            {authUser => (
-      <li>
-          {loadingTeam && <div>Loading...</div>}
-          {team && (
+      <AuthUserContext.Consumer>
+        {authUser => (
+          <div>
+            {loadingTeam && <div>Loading...</div>}
+            {team && (
               <div>
-        {condition(authUser.uid) && editMode ? (
-          <input
-            type="text"
-            value={editText}
-            onChange={this.onChangeEditText}
-          />
-        ) : (
-          <span>
-            <strong>{team.uid}</strong> {team.name}
+                {condition(authUser.uid) && editMode ? (
+                  <input
+                    type="text"
+                    value={editText}
+                    onChange={this.onChangeEditText}
+                    style={inputField}
+                  />
+                ) : (
+                  <span>
+                    <h1><strong>{team.name}</strong></h1>
+                    {team.uid}
+                  </span>
+                )}
 
-          </span>
-        )}
+                {condition(authUser.uid) && (
+                  <span>
+                    {editMode ? (
+                      <span>
+                        <button onClick={this.onSaveEditText}>Save</button>
+                      </span>
+                    ) : (
+                      <button onClick={this.onToggleEditMode}>Edit</button>
+                    )}
 
-        {condition(authUser.uid) && (
-          <span>
-            {editMode ? (
-              <span>
-                <button onClick={this.onSaveEditText}>Save</button>
-              </span>
-            ) : (
-              <button onClick={this.onToggleEditMode}>Edit</button>
-            )}
-
-            {!editMode && (
-              <button
-                type="button"
-                onClick={() => this.onRemoveTeam(team.uid)}
-              >
-                Delete
-              </button>
-            )}
-          </span>
-        )}
-        {loading && <div>Loading ...</div>}
-        {members && (<div>
-          <ul> {
-            //  pentru fiecare echipa afisam o componenta corezpunzatoare
-            // de tipul Team
-            members.map(member => (
-              <div>
-
-                <li>{member.email}</li>
-                {condition(authUser.uid) && !editMode && (
-                  <button
-                    type="button"
-                    onClick={() => this.onRemoveMember(team, member.userId)}
-                  >
-                    Delete Member
-                  </button>
+                    {!editMode && (
+                      <button
+                        type="button"
+                        onClick={() => this.onRemoveTeam(team.uid)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </span>
+                )}
+                {loading && <div>Loading ...</div>}
+                {members && (<div>
+                  <h3>Team members</h3>
+                  <ul> {
+                    //  pentru fiecare echipa afisam o componenta corezpunzatoare
+                    // de tipul Team
+                    members.map(member => (
+                      <div>
+                        <li>{member.email}</li>
+                        {condition(authUser.uid) && !editMode && this.props.firebase.authUser.email !== member.email && (
+                          <button
+                            type="button"
+                            onClick={() => this.onRemoveMember(team, member.userId)}
+                          >
+                            Delete Member
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </ul>
+                  {condition(authUser.uid) && (addMemberMode ? (
+                    <div>
+                      <input
+                        type="text"
+                        value={userEmail}
+                        onChange={this.onChangeEditEmail}
+                        style={inputField}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => this.onAddMember(team)}
+                      >
+                        Add
+                      </button>
+                      <button onClick={this.onToggleAddMemberMode}>Close</button>
+                    </div>)
+                    :
+                    <button onClick={this.onToggleAddMemberMode}>Add member</button>
+                  )}
+                  {
+                    (!!(condition(authUser.id)) && team.members.includes(authUser.uid)) ? (
+                      <button type="button"
+                        onClick={() => this.onLeaveTeam(team, authUser.uid)}>
+                        Leave Team
+                      </button>
+                    ) :
+                      <span></span>
+                  }
+                </div>
                 )}
               </div>
-            ))}
-          </ul>
-          {condition(authUser.uid) && (addMemberMode ? (
-          <div>
-            <input
-              type="text"
-              value={userEmail}
-              onChange={this.onChangeEditEmail}
-            />
-            <button
-              type="button"
-              onClick={() => this.onAddMember(team)}
-            >
-              Add
-                  </button>
-            <button onClick={this.onToggleAddMemberMode}>Close</button>
-          </div>)
-            :
-            <button onClick={this.onToggleAddMemberMode}>Add member</button>
-          )}
-          {
-             (!!(condition(authUser.id)) && team.members.includes(authUser.uid)) ? (
-             <button type ="button"
-             onClick = {() => this.onLeaveTeam(team, authUser.uid)}>
-               Leave Team
-             </button>
-             ):
-             <span></span>
-          }
-        </div>
+            )}
+          </div>
         )}
-        </div>
-        )}
-      </li>
-      )}
       </AuthUserContext.Consumer>
     );
   }

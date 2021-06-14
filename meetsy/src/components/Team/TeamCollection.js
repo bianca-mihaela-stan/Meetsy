@@ -5,8 +5,7 @@ import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import TeamItem from './TeamItem';
 import Grid from "@material-ui/core/Grid";
-import styled from 'styled-components';
-import { COLORS } from '../../constants/designConstants';
+import { COLORS, form, StyledTextArea, StyledInput, StyledButton } from '../../constants/designConstants';
 
 class TeamCollection extends Component {
   constructor(props) {
@@ -67,7 +66,7 @@ class TeamCollection extends Component {
     this.setState({ name: event.target.value });
   };
   onChangeDescription = event => {
-      this.setState({description: event.target.value});
+    this.setState({ description: event.target.value });
   }
   // avem optiunea de a crea o echipa direct de pe pagina de listare
   // a echipelor - de aceea trebuie ca metoda de create sa fie definita
@@ -80,25 +79,45 @@ class TeamCollection extends Component {
       members: [authUser.uid],
       description: this.state.description
     }).then((doc) => {
-     
+
       this.props.firebase.user(authUser.uid).get().then(query => {
-      const newTeams = query.data().teams;
-      newTeams.push(doc.id);
-      this.props.firebase.user(authUser.uid).update({
-        teams: newTeams
-      })
-      this.setState({ name: '' , description: ''});
-      this.setState()
+        const newTeams = query.data().teams;
+        newTeams.push(doc.id);
+        this.props.firebase.user(authUser.uid).update({
+          teams: newTeams
+        })
+        this.setState({ name: '', description: '' });
+        this.setState()
       })
     })
       .catch((error) => {
         console.error("Error creating team: ", error);
       });
-     
+
   };
+
+  compare(a, b) {
+    if (a.name.toLowerCase() < b.name.toLowerCase())
+      return -1;
+    if (a.name.toLowerCase() > b.name.toLowerCase())
+      return 1;
+    return 0;
+  }
 
   render() {
     const { name, teams, loading, description } = this.state;
+    teams.sort(this.compare);
+    var date;
+
+    this.props.firebase.events().onSnapshot(snapshot => {
+      let evs = [];
+      snapshot.forEach(doc => {
+
+        evs.push({ ...doc.data(), uid: doc.id })
+      }
+      );
+      console.log("Membrii: ", new Date(evs[0].startDate * 1000));
+    })
 
     return (
       <AuthUserContext.Consumer>
@@ -110,18 +129,19 @@ class TeamCollection extends Component {
             {loading && <div>Loading ...</div>}
 
             {teams && (
-                <Grid container spacing={1}>
-               {
-                //  pentru fiecare echipa afisam o componenta corezpunzatoare
-                // de tipul Team
-                teams.map(team => (
+              <Grid container spacing={1}>
+                {
+                  //  pentru fiecare echipa afisam o componenta corezpunzatoare
+                  // de tipul Team
+
+                  teams.map(team => (
                     <Grid item xs={12} sm={6} md={3}>
-                    <TeamItem
-                    authUser={authUser}
-                    team = {team}
-                  />
-                  </Grid>
-                ))}
+                      <TeamItem
+                        authUser={authUser}
+                        team={team}
+                      />
+                    </Grid>
+                  ))}
               </Grid>
             )}
 
@@ -132,17 +152,18 @@ class TeamCollection extends Component {
                 this.onCreateTeam(event, authUser)
               }
             >
-              <h4 style={{'marginBottom': '10px'}}>Create a new course</h4>
+              <h4></h4>
+              <h4 style={{ 'marginBottom': '10px' }}>Create a new team</h4>
               <StyledInput
                 type="text"
                 value={name}
-                placeholder = 'Name'
+                placeholder='Name'
                 onChange={this.onChangeText}
               />
               <StyledTextArea
                 type="text"
                 value={description}
-                placeholder = 'Description'
+                placeholder='Description'
                 onChange={this.onChangeDescription}
               />
               <StyledButton type="submit">Create Team</StyledButton>
@@ -152,81 +173,7 @@ class TeamCollection extends Component {
     );
   }
 }
-const StyledButton  =  styled.button`
-  max-width: 350px;
-  min-width: 250px;
-  height: 40px;
-  border: none;
-  margin: 1rem 0;
-  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
-  border-radius: 32px;
-  background-color: #3e6ae1;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: center;
-  &:hover {
-    background-color: #3457b1;
-  }
-`;
-const StyledInput = styled.input`
- width: 450px;
- margin-left:auto !important;
- margin-right:auto !important;
 
- height: 40px;
- border: none;
- margin: 0.5rem 0;
- color: #393c41 !important;
- background-color: #f5f5f5;
- box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
- border-radius: 32px;
- padding:  0 1rem;
- &:hover{
-  outline-width: 0;
- }
- &:focus{
-  outline-width: 0;
-  // border: 3px solid rgb(62,106,225,0.7);
- }
-`;
-const StyledTextArea = styled.textarea`
- width: 450px;
- margin-right:auto !important;
- margin-left:auto !important;
- height: 100px;
- border: none;
- margin: 0.5rem 0;
- color: #393c41 !important;
- background-color: #f5f5f5;
- box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
- border-radius: 8px;
- padding:  1rem 1rem;
- &:hover{
-  outline-width: 0;
- }
- &:focus{
-  outline-width: 0;
-  // border: 3px solid rgb(62,106,225,0.7);
- }
-`;
-const form = {
-    marginTop: '10%',
-    marginRight: 'auto !important',
-    marginLeft: 'auto !important',
-    padding: '5%',
-    //#13d3df #5577f2
-    backgroundColor: '#53a7e1',
-    boxSizing: 'border-box',
-    display: 'flex',
-    borderRadius: '8px',
-    minWidth: '300px',
-    maxWidth: '500px',
-    flexDirection: 'column',
-    alignContent: 'center',
-    justifyContent: 'right',
-    boxSizing: 'initial'
-   };
 // folosim withFirebase pentru a putea accesa data de baza
 // prin intermediul atributului this.props.firebase
 export default withFirebase(TeamCollection);

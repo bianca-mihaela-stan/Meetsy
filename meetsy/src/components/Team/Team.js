@@ -47,6 +47,11 @@ class Team extends Component {
   }
 
   onRemoveMember = (team, memberId) => {
+
+    if (this.props.firebase.authUser.uid === memberId) {
+      return;
+    }
+
     const { members } = this.state;
     var currentMember = members.find(u => u.userId == memberId);
     var oldTeams = currentMember.teams;
@@ -60,33 +65,35 @@ class Team extends Component {
     })
   }
   onLeaveTeam = (team, memberId) => {
-    const {members} = this.state;
-    this.onRemoveMember(team,memberId)
-    if(members.length == 1){
-       this.onRemoveTeam(team.uid);
+    const { members } = this.state;
+    this.onRemoveMember(team, memberId)
+    if (members.length == 1) {
+      this.onRemoveTeam(team.uid);
     }
   }
   onAddMember = (team) => {
     const { members } = this.state;
     this.props.firebase.userByEmail(this.state.userEmail).get().then(query => {
-     query.forEach(doc => { if (doc.exists) {
-        const user = doc.data();
-        console.log(user, typeof (user));
-        var newMembers = members.map(u => u.userId);
-        newMembers.push(user.userId)
-        this.props.firebase.team(team.uid).update({
-          members: newMembers
-        });
-        var newTeams = user.teams;
-        newTeams.push(team.uid);
-        this.props.firebase.user(user.userId).update({
-          teams: newTeams
-        })
-      }
-      else {
-        console.log("No such user!");
-      }
-    })}
+      query.forEach(doc => {
+        if (doc.exists) {
+          const user = doc.data();
+          console.log(user, typeof (user));
+          var newMembers = members.map(u => u.userId);
+          newMembers.push(user.userId)
+          this.props.firebase.team(team.uid).update({
+            members: newMembers
+          });
+          var newTeams = user.teams;
+          newTeams.push(team.uid);
+          this.props.firebase.user(user.userId).update({
+            teams: newTeams
+          })
+        }
+        else {
+          console.log("No such user!");
+        }
+      })
+    }
     ).catch((error) => {
       console.log("Error getting document:", error);
     });
@@ -186,38 +193,39 @@ class Team extends Component {
             ))}
           </ul>
           {this.condition(authUser.uid) && (addMemberMode ? (
-          <div>
-            <input
-              type="text"
-              value={userEmail}
-              onChange={this.onChangeEditEmail}
-            />
-            <button
-              type="button"
-              onClick={() => this.onAddMember(team)}
-            >
-              Add
+            <div>
+              <input
+                type="text"
+                value={userEmail}
+                onChange={this.onChangeEditEmail}
+              />
+              <button
+                type="button"
+                onClick={() => this.onAddMember(team)}
+              >
+                Add
                   </button>
-            <button onClick={this.onToggleAddMemberMode}>Close</button>
-          </div>)
+              <button onClick={this.onToggleAddMemberMode}>Close</button>
+            </div>)
             :
             <button onClick={this.onToggleAddMemberMode}>Add member</button>
           )}
           {
-             (!!(this.condition(authUser.id)) && this.props.team.members.includes(authUser.uid)) ? (
-             <button type ="button"
-             onClick = {() => this.onLeaveTeam(team, authUser.uid)}>
-               Leave Team
-             </button>
-             ):
-             <span></span>
+            (!!(this.condition(authUser.id)) && this.props.team.members.includes(authUser.uid)) ? (
+              <button type="button"
+                onClick={() => this.onLeaveTeam(team, authUser.uid)}>
+                Leave Team
+              </button>
+            ) :
+              <span></span>
           }
         </div>
         )}
-        
+
       </li>
     );
   }
 }
+
 
 export default withFirebase(Team);

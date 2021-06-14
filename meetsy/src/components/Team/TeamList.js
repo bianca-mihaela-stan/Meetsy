@@ -72,20 +72,20 @@ class TeamList extends Component {
       ownerId: authUser.uid,
       members: [authUser.uid]
     }).then((doc) => {
-     
+
       this.props.firebase.user(authUser.uid).get().then(query => {
-      const newTeams = query.data().teams;
-      newTeams.push(doc.id);
-      this.props.firebase.user(authUser.uid).update({
-        teams: newTeams
-      })
-      this.setState({ name: '' });
+        const newTeams = query.data().teams;
+        newTeams.push(doc.id);
+        this.props.firebase.user(authUser.uid).update({
+          teams: newTeams
+        })
+        this.setState({ name: '' });
       })
     })
       .catch((error) => {
         console.error("Error creating team: ", error);
       });
-     
+
   };
 
   render() {
@@ -126,7 +126,8 @@ class TeamList extends Component {
                 onChange={this.onChangeText}
               />
               <button type="submit">Create Team</button>
-            </form> </div>
+            </form>
+          </div>
         )}
       </AuthUserContext.Consumer>
     );

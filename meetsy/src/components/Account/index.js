@@ -15,7 +15,7 @@ class AccountPage extends Component {
       {authUser => (
         <div>
           <h1>Account: {this.props.firebase.authUser.username}</h1>
-          <PasswordForgetForm />
+          {/* <PasswordForgetForm /> */}
           <PasswordChangeForm />
         </div>
       )

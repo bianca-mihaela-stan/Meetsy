@@ -8,6 +8,7 @@ import { PasswordForgetLink } from '../PasswordForget';
 import { StyleSheet, css } from 'aphrodite';
 import styled from "styled-components";
 import { withAuthorization } from '../Session';
+import { COLORS, errorMsg } from '../../constants/designConstants'
 
 
 const SignInLink = () => (
@@ -47,12 +48,6 @@ const StyledButton = styled.button`
     background-color: #0087e0;
   }
 `;
-const errorMsg = {
-  textAlign: 'center',
-  paddingTop: '1pc',
-  paddingBottom: '1pc',
-  color: '#c70000'
-};
 
 const Container = styled.div`
      h4 {
@@ -171,7 +166,7 @@ class SignInFormBase extends Component {
           /></div>
         <StyledButton disabled={isInvalid} type="submit">
           Sign In
-          </StyledButton >
+        </StyledButton >
 
         {error && <p style={errorMsg}>{error.message}</p>}
       </form>
