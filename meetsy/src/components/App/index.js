@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Column, Row } from 'simple-flexbox';
 import { StyleSheet, css } from 'aphrodite';
@@ -14,11 +14,18 @@ import AdminPage from '../Admin';
 import Room from '../Room';
 import Meet from '../Meet'
 import { AuthUserContext } from '../Session';
- 
+import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import { withAuthentication } from '../Session';
 import HeaderComponent from '../Header';
 import {COLORS} from '../../constants/designConstants';
+import { UserItem, UserList } from '../Users';
+import TeamList from '../Team/TeamList';
+import Team from '../Team/Team';
+import TeamComponent from '../Team/TeamComponent';
+import TeamCollection from '../Team/TeamCollection';
+import {compose} from 'recompose';
+import LoadingScreen from 'react-loading-screen';
 const styles = StyleSheet.create({
 
   content: {
@@ -33,38 +40,92 @@ const styles = StyleSheet.create({
       color: `${COLORS.body}`
   }
 });
-
-const App = () => (
-
-  <Router>
-    <div>
-    <Row className={css(styles.container)}>
-      
-      <Navigation />
-      <Column flexGrow={1} className={css(styles.mainBlock)}>
-      <AuthUserContext.Consumer>
-      {authUser =>
-        authUser ? <HeaderComponent/> : void 0
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { loading: true};
+  }
+  componentDidMount(){
+    this.props.firebase.auth.onAuthStateChanged(authUser => {
+      this.setState({loading: true})
+      console.log("Out here!", this.state.loading);
+       if (authUser) {
+         console.log("In here!");
+         this.props.firebase.user(authUser.uid)
+           .get()
+           .then(snapshot => {
+             const dbUser = snapshot.data();
+             // default empty roles
+             if (!dbUser.roles) {
+               dbUser.roles = {};
+             }
+             // merge auth and db user
+             console.log(dbUser);
+             this.props.firebase.authUser = {
+               uid: authUser.uid,
+               email: authUser.email,
+               emailVerified: authUser.emailVerified,
+               providerData: authUser.providerData,
+               ...dbUser,
+             };
+             console.log("Loading-ul este: " , this.state.loading)
+             console.log(this.props.firebase.authUser);  
+             this.setState({loading: false})      
+           });
+       } else {
+          console.log("Loading-ul este pe callback: ", this.state.loading)
+          this.setState({loading:false})
+       }
+     });
+  }
+  render() {
+    if(this.state.loading)
+        return (
+        <LoadingScreen loading = {true}
+         bgColor = {COLORS.primaryBg}
+         textColor={COLORS.body}
+         text= 'Meetsy'
+         >
+         </LoadingScreen>
+        );
+    return (
+    <Router>
+      <div>
+      <Row className={css(styles.container)}>
+        
+        <Navigation />
+        <Column flexGrow={1} className={css(styles.mainBlock)}>
+        <AuthUserContext.Consumer>
+        {authUser =>
+          authUser ? <HeaderComponent/> : void 0
+        }
+      </AuthUserContext.Consumer>
+            <Route exact path={ROUTES.LANDING} component={LandingPage} />
+            <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+            <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+            <Route
+              path={ROUTES.PASSWORD_FORGET}
+              component={PasswordForgetPage}
+            />
+            <Route path={ROUTES.ROOM} component={Room} />
+            <Route path={ROUTES.HOME} component={HomePage} />
+            <Route path={ROUTES.ACCOUNT} component={AccountPage} />
+            <Route path={ROUTES.ADMIN} component={AdminPage} />
+            <Route path={ROUTES.CALENDAR} component={CalendarPage} />
+            <Route path={ROUTES.TEAMS} component={TeamList} />
+            <Route path={ROUTES.USERS} component={UserList} />
+            <Route path={ROUTES.USER_DETAILS} component={UserItem} />
+            <Route path={ROUTES.SHOW_TEAMS} component={TeamCollection}/>
+            <Route path="/meet/:url" component={Meet} />
+            <Route path="/showteam/:teamId" component={TeamComponent} />
+            {/* <Route path={ROUTES.TEAM} component={TeamComponent}/> */}
+          </Column>
+        </Row>
+      </div>
+    </Router>
+    );
       }
-    </AuthUserContext.Consumer>
-          <Route exact path={ROUTES.LANDING} component={LandingPage} />
-          <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-          <Route path={ROUTES.SIGN_IN} component={SignInPage} />
-          <Route
-            path={ROUTES.PASSWORD_FORGET}
-            component={PasswordForgetPage}
-          />
-          <Route path={ROUTES.ROOM} component={Room} />
-          <Route path={ROUTES.HOME} component={HomePage} />
-          <Route path={ROUTES.ACCOUNT} component={AccountPage} />
-          <Route path={ROUTES.ADMIN} component={AdminPage} />
-          <Route path={ROUTES.CALENDAR} component={CalendarPage} />
-          <Route path="/meet/:url" component={Meet} />
-        </Column>
-      </Row>
-    </div>
-  </Router>
+}
+ 
 
-);
-
-export default withAuthentication(App);
+export default compose(withFirebase, withAuthentication)(App);

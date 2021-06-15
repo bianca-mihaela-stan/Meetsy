@@ -4,11 +4,15 @@
 } */
 
 body {
-    color: white !important;
+    color: white;
 }
 
 .rbc-day-bg {
     background: rgb(0, 0, 0) !important;
+}
+
+.rbc-btn-group > button:focus {
+    background-color: #01abf4 !important;
 }
 
 .rbc-btn-group > button {

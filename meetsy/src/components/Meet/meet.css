@@ -49,3 +49,7 @@ p{
 .black{
     color: black;
 }
+
+.btn-down > .MuiIconButton-root:nth-of-type(1) > .MuiIconButton-label {
+    color: #c70000;
+}

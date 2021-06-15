@@ -4,9 +4,9 @@ import { compose } from 'recompose';
 import { SignUpLink } from '../SignUp';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
-import { PasswordForgetLink } from '../PasswordForget'; 
+import { PasswordForgetLink } from '../PasswordForget';
 import { StyleSheet, css } from 'aphrodite';
-import  styled  from "styled-components";
+import styled from "styled-components";
 import { withAuthorization } from '../Session';
 
 
@@ -17,9 +17,9 @@ const SignInLink = () => (
 );
 
 const heading = {
-           marginBottom: '2rem',
-           alignSelf: 'center'
-     };
+  marginBottom: '2rem',
+  alignSelf: 'center'
+};
 const form = {
   marginTop: '10%',
   display: 'flex',
@@ -28,8 +28,8 @@ const form = {
   alignContent: 'center',
   justifyContent: 'center',
   boxSizing: 'initial'
- };
-const StyledButton  =  styled.button`
+};
+const StyledButton = styled.button`
   width: 75%;
   max-width: 350px;
   min-width: 250px;
@@ -38,16 +38,21 @@ const StyledButton  =  styled.button`
   margin: 1rem 0;
   box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
   border-radius: 32px;
-  background-color: #3e6ae1;
+  background-color: #01abf4;
   color: white;
   font-weight: 600;
   cursor: pointer;
   align-self: center;
   &:hover {
-    background-color: #3457b1;
+    background-color: #0087e0;
   }
 `;
-
+const errorMsg = {
+  textAlign: 'center',
+  paddingTop: '1pc',
+  paddingBottom: '1pc',
+  color: '#c70000'
+};
 
 const Container = styled.div`
      h4 {
@@ -94,35 +99,35 @@ padding: 0;
 margin: 0;
 `;
 const inputCtn = {
-   display: 'flex',
-   justifyContent: 'center',
-   alignContent: 'center'
+  display: 'flex',
+  justifyContent: 'center',
+  alignContent: 'center'
 };
 
 const SignInPage = () => (
-    <Container>
+  <Container>
     <SignInForm />
     <PasswordForgetLink />
     <SignUpLink />
-    </Container>
+  </Container>
 );
- 
+
 const INITIAL_STATE = {
   email: '',
   password: '',
   error: null,
 };
- 
+
 class SignInFormBase extends Component {
   constructor(props) {
     super(props);
- 
+
     this.state = { ...INITIAL_STATE };
   }
- 
+
   onSubmit = event => {
     const { email, password } = this.state;
- 
+
     this.props.firebase
       .doSignInWithEmailAndPassword(email, password)
       .then(() => {
@@ -132,55 +137,54 @@ class SignInFormBase extends Component {
       .catch(error => {
         this.setState({ error });
       });
- 
+
     event.preventDefault();
   };
- 
+
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
- 
+
   render() {
     const { email, password, error } = this.state;
- 
+
     const isInvalid = password === '' || email === '';
- 
+
     return (
       <form style={form} onSubmit={this.onSubmit}>
-      <h3 style={heading}>Sign in</h3>
-      <div style={inputCtn}>
-      <StyledInput
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        /></div>
+        <h3 style={heading}>Sign in</h3>
         <div style={inputCtn}>
-        <StyledInput
-          name="password"
-          value={password}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        /></div>
-         <StyledButton  disabled={isInvalid} type="submit">
+          <StyledInput
+            name="email"
+            value={email}
+            onChange={this.onChange}
+            type="text"
+            placeholder="Email Address"
+          /></div>
+        <div style={inputCtn}>
+          <StyledInput
+            name="password"
+            value={password}
+            onChange={this.onChange}
+            type="password"
+            placeholder="Password"
+          /></div>
+        <StyledButton disabled={isInvalid} type="submit">
           Sign In
           </StyledButton >
- 
-        {error && <p>{error.message}</p>}
+
+        {error && <p style={errorMsg}>{error.message}</p>}
       </form>
     );
   }
 }
- 
+
 const SignInForm = compose(
   withRouter,
   withFirebase,
 )(SignInFormBase);
- 
+
 const condition = authUser => !authUser;
 export default withAuthorization(condition)(SignInPage);
- 
 
 export { SignInForm, SignInLink };
