@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import io from 'socket.io-client'
 import { AuthUserContext, withAuthorization } from '../Session';
 import * as ROUTES from '../../constants/routes';
+import SingletonFactory from '../Firebase/firebase';
 import { IconButton, Badge, Input, Button } from '@material-ui/core'
 import VideocamIcon from '@material-ui/icons/Videocam'
 import VideocamOffIcon from '@material-ui/icons/VideocamOff'
@@ -13,6 +14,7 @@ import CallEndIcon from '@material-ui/icons/CallEnd'
 import ChatIcon from '@material-ui/icons/Chat'
 import { withFirebase } from '../Firebase';
 import { compose } from 'recompose';
+import 'firebase/storage';
 
 import { message } from 'antd'
 import 'antd/dist/antd.css'
@@ -45,9 +47,9 @@ class Meet extends Component {
 
 		this.localVideoref = React.createRef()
 		this.file_input = React.createRef()
-		// this.drop_region_container = React.createRef()
 		this.videoAvailable = false
 		this.audioAvailable = false
+        this.storage = SingletonFactory.getInstance().storage;
 
 		this.state = {
 			video: false,
@@ -61,12 +63,10 @@ class Meet extends Component {
 			uploadedImages: [],
 			previewImages: [],
 			images: [],
-			greenDrop: false,
 			newmessages: 0,
 			askForUsername: true,
 			username: this.props.firebase.authUser.username,
 			userId: this.props.firebase.authUser.userId,
-			dragHighlight: false,
 		}
 		connections = {}
 
@@ -310,6 +310,7 @@ class Meet extends Component {
 
 			socket.on('image', (data, sender, socketIdSender) => {
 				console.log("socket.on(image)")
+                console.log(data)
 				this.addImage(data, sender, socketIdSender)
 			})
 
@@ -336,7 +337,6 @@ class Meet extends Component {
 
 					// Wait for their video stream
 					connections[socketListId].onaddstream = (event) => {
-						// TODO mute button, full screen button
 						var searchVidep = document.querySelector(`[data-socket="${socketListId}"]`)
 						if (searchVidep !== null) { // if i don't do this check it make an empyt square
 							searchVidep.srcObject = event.stream
@@ -437,21 +437,22 @@ class Meet extends Component {
 	}
 
 	addImage = (image, sender, socketIdSender) => {
-		console.log("addImage")
-		this.setState(prevState => ({
-			messages: [...prevState.messages, { 'sender': sender, "data": image, "type": "image" }],
-		}))
-		if (socketIdSender !== socketId) {
-			this.setState({ newmessages: this.state.newmessages + 1 })
-		}
-		console.log(this.state.images)
+        var folder = window.location.href.substring(27);
+        this.storage
+            .ref(folder)
+            .child(image)
+            .getDownloadURL()
+            .then(url => {
+                console.log("url "+ url)
+                this.setState(prevState => ({
+                    messages: [...prevState.messages, { 'sender': sender, "data": url, "type": "image" }],
+                }))
+                if (socketIdSender !== socketId) {
+                    this.setState({ newmessages: this.state.newmessages + 1 })
+                }
+                console.log(this.state.images)
+            })
 	}
-
-	// addImage = (image) => {
-	//     this.setState(prevState => ({
-	//         images : [...prevState.images, image]
-	//     }))
-	// }
 
 	openImageUloader = () => this.setState({ showImageUploader: true, showModal: false })
 	closeImageUloader = () => this.setState({ showImageUploader: false, showModal: true })
@@ -459,18 +460,6 @@ class Meet extends Component {
 	preventDefaults = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-	};
-
-
-	uploadFile = (files) => {
-		console.log(files)
-		// const formData = new FormData();
-		// this.state.previewImages = this.state.previewImages.concat(files);
-		// const formData = new FormData();
-		files.forEach((file) => {
-			this.setState({ previewImages: this.state.previewImages.concat(file) },
-				() => { console.log(this.state.previewImages) });
-		});
 	};
 
 	removePreviewImage = (e) => {
@@ -486,7 +475,6 @@ class Meet extends Component {
 	};
 
 	handleDrop = (e) => {
-		// this.setState({dragHighlight: false})
 		e.preventDefault();
 		const files = e.dataTransfer.files;
 		this.uploadFile(Array.from(files));
@@ -496,7 +484,6 @@ class Meet extends Component {
 	};
 
 	handleDragOver = (e) => {
-		// this.setState({dragHighlight: true})
 		e.preventDefault();
 		this.setState({
 			greenDrop: true
@@ -546,28 +533,6 @@ class Meet extends Component {
 		}
 	}
 
-	getBase64 = file => {
-		return new Promise(resolve => {
-			let fileInfo;
-			let baseURL = "";
-			// Make new FileReader
-			let reader = new FileReader();
-
-			// Convert the file to base64 text
-			reader.readAsDataURL(file);
-
-			// on reader load somthing...
-			reader.onload = () => {
-				// Make a fileInfo Object
-				console.log("Called", reader);
-				baseURL = reader.result;
-				console.log(baseURL);
-				resolve(baseURL);
-			};
-			console.log(fileInfo);
-		});
-	};
-
 	sendImages = () => {
 		console.log(this.state.previewImages)
 		console.log(this.state.previewImages.length)
@@ -575,11 +540,23 @@ class Meet extends Component {
 		if (this.state.previewImages.length > 0) {
 			console.log("sendImages")
 			this.state.previewImages.forEach((image) => {
-				socket.emit('image', URL.createObjectURL(image), this.state.username)
+                console.log("inamge.fileInfo " + image.name);
+                console.log(window.location.href);
+                console.log(window.location.href.substring(27));
+				socket.emit('image', image.name, this.state.username);
+                var folder = window.location.href.substring(27);
+                var uploadTask = this.storage.ref(folder + '/'+ image.name).put(image);
+                uploadTask.on(
+                    "state_changed",
+                    error => {
+                        console.log(error)
+                    }
+                )
 			})
 			this.setState({ previewImages: [], sender: this.state.username })
 		}
-	}
+        
+    }
 
 	copyUrl = () => {
 		let text = window.location.href

@@ -28,7 +28,9 @@ class MyCalendar extends Component {
             events: [],
 
             startDate: null,
+            startTime: null,
             endDate: null,
+            endTime: null,
 
             startDateSet: false,
             endDateSet: false,
@@ -111,7 +113,7 @@ class MyCalendar extends Component {
 
     onAddEvent = (event) => {
         event.preventDefault();
-        const { events, title, startDate, endDate, startTimeSet, endTimeSet, startDateSet, endDateSet, description, isPrivate } = this.state;
+        const { events, title, startDate, endDate, startTimeSet, endTimeSet, startDateSet, endDateSet, description, isPrivate, startTime, endTime } = this.state;
 
         this.setState({
             success: null,
@@ -124,6 +126,9 @@ class MyCalendar extends Component {
             });
             return;
         }
+
+        startDate.setSeconds(startTime / 1000);
+        endDate.setSeconds(endTime / 1000);
 
         if (endDate <= startDate) {
             this.setState({
@@ -187,23 +192,15 @@ class MyCalendar extends Component {
 
     onChangeTime = (event, field) => {
         var time = event.target.value.split(":");
-        var hour = time[0];
-        var minute = time[1];
+        var hours = time[0] * 3600 * 1000;
+        var minutes = time[1] * 60 * 1000;
 
         if (field === 'startTime') {
-            const { startDate } = this.state;
-            startDate.setHours(hour);
-            startDate.setMinutes(minute);
-
-            this.setState({ startDate: startDate, startTimeSet: true });
+            this.setState({ startTime: hours + minutes, startTimeSet: true });
 
         }
         else if (field === 'endTime') {
-            const { endDate } = this.state;
-            endDate.setHours(hour);
-            endDate.setMinutes(minute);
-
-            this.setState({ endDate: endDate, endTimeSet: true });
+            this.setState({ endTime: hours + minutes, endTimeSet: true });
         }
     }
 
@@ -269,21 +266,18 @@ class MyCalendar extends Component {
                             />
                             <h6 style={{ textAlign: 'center' }}>End Date</h6>
                             <StyledInput
-                                disabled={!this.state.startDateSet}
                                 type="date"
                                 id="eventEndDate"
                                 onChange={(e) => this.onChangeDate(e, 'endDate')}
                             />
                             <h6 style={{ textAlign: 'center' }}>Start Time</h6>
                             <StyledInput
-                                disabled={!this.state.endDateSet}
                                 type="time"
                                 id="eventStartTime"
                                 onChange={(e) => this.onChangeTime(e, 'startTime')}
                             />
                             <h6 style={{ textAlign: 'center' }}>End Time</h6>
                             <StyledInput
-                                disabled={!this.state.startTimeSet}
                                 type="time"
                                 id="eventEndTime"
                                 onChange={(e) => this.onChangeTime(e, 'endTime')}

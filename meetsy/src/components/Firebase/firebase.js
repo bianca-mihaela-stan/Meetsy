@@ -10,6 +10,7 @@ import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 import 'firebase/database';
+import 'firebase/storage';
 import { domainName } from "../../constants/domainName";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -24,7 +25,7 @@ const firebaseConfig = {
 };
 
 
-var SingletonFactory = (function() {
+var SingletonFactory = (function () {
 
   class Firebase {
     constructor() {
@@ -32,68 +33,69 @@ var SingletonFactory = (function() {
 
     this.auth = firebase.auth();
     this.db = firebase.firestore();
+    this.storage = firebase.storage();
 
-  }
-  // *** Auth API ***
-  doCreateUserWithEmailAndPassword = (email, password) =>
-    this.auth.createUserWithEmailAndPassword(email, password);
+    }
+    // *** Auth API ***
+    doCreateUserWithEmailAndPassword = (email, password) =>
+      this.auth.createUserWithEmailAndPassword(email, password);
 
-  doSignInWithEmailAndPassword = (email, password) =>
-    this.auth.signInWithEmailAndPassword(email, password);
+    doSignInWithEmailAndPassword = (email, password) =>
+      this.auth.signInWithEmailAndPassword(email, password);
 
   doSignOut = () => {
     this.auth.signOut();
     window.location.href = domainName;
   }
 
-  doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
+    doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
 
-  doPasswordUpdate = password =>
-    this.auth.currentUser.updatePassword(password);
-  // ** Merge Auth and DB User API
+    doPasswordUpdate = password =>
+      this.auth.currentUser.updatePassword(password);
+    // ** Merge Auth and DB User API
 
-  // *** User API ***
-  get dbUser() {
-    this.user(this.auth.currentUser.uid).get().then(query => {
-      return query.data();
-    }).catch((error) => {
-      console.log("No such user!");
-    });
-    return null;
-  }
-  user = uid => this.db.doc(`users/${uid}`);
+    // *** User API ***
+    get dbUser() {
+      this.user(this.auth.currentUser.uid).get().then(query => {
+        return query.data();
+      }).catch((error) => {
+        console.log("No such user!");
+      });
+      return null;
+    }
+    user = uid => this.db.doc(`users/${uid}`);
 
-  users = () => this.db.collection('users');
+    users = () => this.db.collection('users');
 
-  userByEmail = email => this.db.collection('users').where('email', "==", email.trim());
+    userByEmail = email => this.db.collection('users').where('email', "==", email.trim());
 
-  // not working - not updating onSnapshot
-  usersByTeam = (tid) => this.db.collection('users').where('teams', 'array-contains-any', [tid]);
-  usersByIds = ids => this.db.collection('users').where('userId', 'in', ids);
+    // not working - not updating onSnapshot
+    usersByTeam = (tid) => this.db.collection('users').where('teams', 'array-contains-any', [tid]);
+    usersByIds = ids => this.db.collection('users').where('userId', 'in', ids);
 
-  // getting a list of the teams of the specified user
-  userTeams = uid => this.db.collection('teams').where('userId', 'like', uid)
+    // getting a list of the teams of the specified user
+    userTeams = uid => this.db.collection('teams').where('userId', 'like', uid)
 
-  // ** Team API ***
+    // ** Team API ***
 
   team = uid => this.db.doc(`teams/${uid}`);
   teams = () => this.db.collection('teams');
 
 
-  // *** Calendar API ***
+    // *** Calendar API ***
 
-  event = uid => this.db.doc(`events/${uid}`);
-  events = () => this.db.collection('events');
+    event = uid => this.db.doc(`events/${uid}`);
+    events = () => this.db.collection('events');
 
-  // *** Meeting API ***
-  meeting = uid => this.db.doc(`meetings/${uid}`);
-  meetings = () => this.db.collection('meetings');
+    // *** Meeting API ***
+    meeting = uid => this.db.doc(`meetings/${uid}`);
+    meetings = () => this.db.collection('meetings');
 
-}
+  }
   var instance;
   return {
-    getInstance: function(){
-      if(!instance){
+    getInstance: function () {
+      if (!instance) {
         instance = new Firebase();
         delete instance.constructor;
       }
@@ -101,4 +103,6 @@ var SingletonFactory = (function() {
     }
   }
 })();
-export default SingletonFactory;
+
+
+export {SingletonFactory as default};

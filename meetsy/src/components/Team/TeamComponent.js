@@ -18,7 +18,6 @@ import IconAdd from '../../assets/icon-add';
 import * as ROUTES from '../../constants/routes';
 import { errorMsg, form, StyledInput,StyledTextArea, addButton, buttonAction, ButtonGroup, backButton, MeetsyButton, StyledButton, blackButton } from '../../styles';
 
-
 const meetButton = {
   backgroundColor: `${COLORS.primaryBlue}`,
   cursor: 'pointer'
@@ -153,7 +152,6 @@ class TeamComponent extends Component {
     }
   }
 
-
   onAddMember = (team) => {
     const { members } = this.state;
     this.props.firebase.userByEmail(this.state.userEmail).get().then(query => {
@@ -269,12 +267,6 @@ class TeamComponent extends Component {
     });
 
     if (startDate === '' || startTime === '' || duration === '' || title === '' || description === '') {
-      console.log("Invalid")
-      console.log(startDate);
-      console.log(startTime);
-      console.log(duration);
-      console.log(title);
-      console.log(description);
       this.setState({ error: "Invalid field value" });
       return;
     }
@@ -343,7 +335,7 @@ class TeamComponent extends Component {
   }
 
   render() {
-    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings } = this.state;
+    const { editMode, editText, members, loading, userEmail, team, loadingTeam, condition, meetings } = this.state;
     meetings.sort(this.compare);
 
     return (
