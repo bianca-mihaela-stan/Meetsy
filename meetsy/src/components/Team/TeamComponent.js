@@ -17,6 +17,7 @@ import IconBack from '../../assets/icon-back';
 import IconAdd from '../../assets/icon-add';
 import * as ROUTES from '../../constants/routes';
 import { StyledInput, addButton, buttonAction, ButtonGroup, backButton, MeetsyButton } from '../../styles';
+import { Row } from 'simple-flexbox';
 
 class TeamComponent extends Component {
   constructor(props) {
