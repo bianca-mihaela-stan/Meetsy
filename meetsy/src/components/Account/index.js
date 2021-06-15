@@ -81,14 +81,12 @@ class AccountPage extends Component {
         <div>
           <h1>Account: {this.props.firebase.authUser.username}</h1>
           <PasswordForgetForm />
-         
-          <StyledInput type="file" onChange={this.onFileChange} />
-          <StyledButton onClick={this.onUploadFile}>Upload Profile Image</StyledButton>
+          
           {/* <PasswordForgetForm /> */}
           <PasswordChangeForm />
           <input type="file" onChange={this.onFileChange} />
-          <button onClick={this.onUploadFile}>Upload Profile Image</button>
-          <button onClick={this.onRemoveProfilePicture}>Remove Profile Picture</button>
+          <StyledButton onClick={this.onUploadFile}>Upload Profile Image</StyledButton>
+          <StyledButton onClick={this.onRemoveProfilePicture}>Remove Profile Picture</StyledButton>
           <br></br>
           <progress value={this.state.progress} max="100" />
 
