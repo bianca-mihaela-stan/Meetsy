@@ -14,12 +14,10 @@ const styles = StyleSheet.create({
     marginLeft: '6vw',
   },
   container: {
-    //'#0e0f10
     position: 'fixed',
     backgroundColor: '#090A0B',
     width: '6vw',
     overflow: 'hidden',
-    // borderRight: '1px solid',
     borderColor: '#363336',
     top: '0',
     left: '0'
@@ -71,16 +69,9 @@ const NavigationAuth = () => (
           path={ROUTES.CALENDAR}
           title="Calendar" icon={IconCalendar}
         />
-        {/* <SignOutButton /> */}
       </Column>
       <Column flexGrow={1}></Column>
      <SignOutButton />
-      {/* <ProfileImage 
-      path={ROUTES.ACCOUNT}
-      title="Profile"
-      size = "47px"
-      content="https://live.staticflickr.com/2942/15151618028_b3132b52d8_b.jpg">
-      </ProfileImage> */}
     </Column>
   </Column>
   </div>

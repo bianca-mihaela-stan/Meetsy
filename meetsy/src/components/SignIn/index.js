@@ -27,6 +27,7 @@ const INITIAL_STATE = {
   password: '',
   error: null,
 };
+const inputStyle = {maxWidth: '350px', margin: '0'}
 
 class SignInFormBase extends Component {
   constructor(props) {
@@ -64,7 +65,7 @@ class SignInFormBase extends Component {
       <form style={form} onSubmit={this.onSubmit}>
         <h3 style={heading}>Sign in</h3>
         <div style={inputCtn}>
-          <StyledInput style = {{maxWidth: '350px', margin: '0'}}
+          <StyledInput style = {inputStyle}
             name="email"
             value={email}
             onChange={this.onChange}
@@ -72,7 +73,7 @@ class SignInFormBase extends Component {
             placeholder="Email Address"
           /></div>
         <div style={inputCtn}>
-          <StyledInput style = {{maxWidth: '350px', margin: '0'}}
+          <StyledInput style = {inputStyle}
             name="password"
             value={password}
             onChange={this.onChange}

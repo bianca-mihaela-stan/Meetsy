@@ -6,7 +6,7 @@ import './calendar.css';
 import { AuthUserContext } from '../Session';
 import React, { Component } from 'react';
 import EventItem from './EventItem';
-import { form, StyledTextArea, StyledInput, StyledButton, StyledCheckbox, errorMsg, successMsg } from '../../constants/designConstants';
+import { form, StyledTextArea, StyledInput, StyledButton, StyledCheckbox, errorMsg, successMsg } from '../../styles';
 
 
 moment.locale("en-GB", {

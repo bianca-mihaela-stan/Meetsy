@@ -1,32 +1,28 @@
 import React, { Component } from 'react';
-import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { withFirebase } from '../Firebase';
 import { AuthUserContext } from '../Session';
 import { withRouter } from "react-router";
 import { compose } from 'recompose';
 import { domainName } from '../../constants/domainName';
-import { form, StyledSmallTextArea, StyledSmallInput, StyledSmallButton, errorMsg, successMsg } from '../../constants/designConstants';
-
+import IconVideo from '../../assets/icon-meeting';
 import styled from 'styled-components';
-import { css } from 'react-loading-screen/node_modules/styled-components';
-import { Column, Row } from 'simple-flexbox';
+import { Row } from 'simple-flexbox';
 import Grid from "@material-ui/core/Grid";
-import { Button } from 'bootstrap';
 import { COLORS } from '../../constants/designConstants';
 import Modal from '../Modal';
-import { StyleSheet } from 'aphrodite';
 import IconDelete from '../../assets/icon-delete';
 import IconEdit from '../../assets/icon-edit';
 import IconBack from '../../assets/icon-back';
 import IconAdd from '../../assets/icon-add';
 import * as ROUTES from '../../constants/routes';
-import { StyledInput, addButton, buttonAction, ButtonGroup, backButton, MeetsyButton, StyledButton } from '../../styles';
+import { errorMsg, form, StyledInput,StyledTextArea, addButton, buttonAction, ButtonGroup, backButton, MeetsyButton, StyledButton, blackButton } from '../../styles';
 
-const inputField = {
-  color: 'black'
+
+const meetButton = {
+  backgroundColor: `${COLORS.primaryBlue}`,
+  cursor: 'pointer'
 }
-
 class TeamComponent extends Component {
   constructor(props) {
     super(props);
@@ -45,13 +41,14 @@ class TeamComponent extends Component {
       error: null,
       success: null,
 
-      title: null,
-      description: null,
-      startDate: null,
-      startTime: null,
-      duration: null,
+      title: '',
+      description: '',
+      startDate: '',
+      startTime: '',
+      duration: '',
       loadingOwner: false,
-      owner: null
+      owner: null,
+      addMeeting: false
     };
   };
 
@@ -83,7 +80,6 @@ class TeamComponent extends Component {
 
   onListenForMembers = () => {
     this.setState({ loading: true });
-    // this.props.firebase.usersByIds(this.props.team.uid)
     this.unsubscribe = this.props.firebase.users()
       .onSnapshot(snapshot => {
         let members = [];
@@ -136,10 +132,6 @@ class TeamComponent extends Component {
 
   onRemoveMember = (team, memberId) => {
 
-    if (this.props.firebase.authUser.uid === memberId) {
-      return;
-    }
-
     const { members } = this.state;
     var currentMember = members.find(u => u.userId === memberId);
     var oldTeams = currentMember.teams;
@@ -155,7 +147,7 @@ class TeamComponent extends Component {
 
   onLeaveTeam = (team, memberId) => {
     const { members } = this.state;
-    this.onRemoveMember(team, memberId)
+    this.onRemoveMember(team, memberId);
     if (members.length == 1) {
       this.onRemoveTeam(team);
     }
@@ -182,6 +174,7 @@ class TeamComponent extends Component {
           this.props.firebase.user(user.userId).update({
             teams: newTeams
           })
+          this.setState({userEmail: ''});
         }
         else {
           console.log("No such user!");
@@ -222,6 +215,12 @@ class TeamComponent extends Component {
       addMemberMode: !state.addMemberMode
     }));
   };
+  onToggleAddMeeting = () => {
+    const newValue = !this.state.addMeeting;
+    this.setState({
+      addMeeting: newValue
+    }, () => { console.log(this.state.addMeeting); });
+  };
 
   onChangeEditText = event => {
     this.setState({ editText: event.target.value });
@@ -246,38 +245,30 @@ class TeamComponent extends Component {
   };
 
   onChangeTime = event => {
-    let time = event.target.value.split(":");
-    let hours = time[0] * 3600 * 1000; // in miliseconds
-    let minutes = time[1] * 60 * 1000; // in miliseconds
-    this.setState({ startTime: hours + minutes });
+    this.setState({ startTime: event.target.value});
   }
 
   onChangeDate = event => {
-    let date = event.target.value.split('-');
-    let year = date[0];
-    let month = date[1] - 1;
-    let day = date[2];
-    let newDate = new Date(year, month, day);
-    this.setState({ startDate: newDate });
+    this.setState({ startDate: event.target.value });
   }
 
   onChangeDuration = event => {
     let duration = event.target.value;
-    duration = duration * 3600 * 1000;  // milliseconds
     this.setState({ duration: duration });
   }
 
   onAddMeeting = event => {
+    console.log("Adauga!");
     event.preventDefault();
     console.log(this.state);
-    let { startDate, startTime, duration, title, description } = this.state;
+    const { startDate, startTime, duration, title, description } = this.state;
 
     this.setState({
       success: null,
       error: null
     });
 
-    if (startDate === null || startTime === null || duration === null || title === null || description === null) {
+    if (startDate === '' || startTime === '' || duration === '' || title === '' || description === '') {
       console.log("Invalid")
       console.log(startDate);
       console.log(startTime);
@@ -287,17 +278,29 @@ class TeamComponent extends Component {
       this.setState({ error: "Invalid field value" });
       return;
     }
+ 
+    // formatam inputul
 
-    startDate.setSeconds(startTime / 1000);
-    let endDate = new Date(startDate.getTime());
-    endDate.setSeconds(duration / 1000);
+    let time = startTime.split(":");
+    let hours = time[0] * 3600 * 1000; // in miliseconds
+    let minutes = time[1] * 60 * 1000; // in miliseconds
+    
+    let date = startDate.split('-');
+    let year = date[0];
+    let month = date[1] - 1;
+    let day = date[2];
+    let newDate = new Date(year, month, day);
+    
+    newDate.setSeconds((hours + minutes) / 1000);
+    let endDate = new Date(newDate.getTime());
+    endDate.setSeconds(duration * 3600);
 
     let link = this.generateMeetingLink();
 
     this.props.firebase.events().add({
       title: title,
       description: description,
-      startDate: startDate,
+      startDate: newDate,
       endDate: endDate,
       private: false,
       userId: this.props.firebase.authUser.uid,
@@ -306,21 +309,22 @@ class TeamComponent extends Component {
 
     this.props.firebase.meetings().add({
       title: title,
-      startDate: startDate,
+      startDate: newDate,
       endDate: endDate,
       teamId: this.state.team.uid,
       meetingLink: link
-    });
+    }).then(() => {   this.setState({
+        title: '',
+        description: '',
+        startDate: '',
+        startTime: '',
+        duration: '',
+        success: "Meeting sheduled successfully",
+        addMeeting: false
+    }, ()=> { console.log("Changed!", this.state.startDate);}); 
+  }).catch(err => {console.log("Eroarea", err)});
 
-    this.setState({
-      title: null,
-      description: null,
-      startDate: null,
-      startTime: null,
-      duration: null,
-      success: "Meeting sheduled successfully"
-    });
-
+  
   }
 
   generateMeetingLink() {
@@ -339,8 +343,7 @@ class TeamComponent extends Component {
   }
 
   render() {
-    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings, title, description, error, success } = this.state;
-
+    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings } = this.state;
     meetings.sort(this.compare);
 
     return (
@@ -351,6 +354,7 @@ class TeamComponent extends Component {
               <h5 style={{ margin: '20px', marginLeft: '30px', position: 'absolute', bottom: '0', fontSize: '3.2rem' }}>{team && <span>{team.name}</span>}</h5>
               {team && condition(authUser.uid) && (
                 <ButtonGroup>
+                  <button style={buttonAction} onClick={this.onToggleAddMeeting}><IconVideo> </IconVideo></button>
                   <button style={buttonAction} onClick={this.onToggleEditMode}><IconEdit></IconEdit></button>
                   <button style={buttonAction}
                     onClick={() => this.onRemoveTeam(team)}
@@ -384,7 +388,15 @@ class TeamComponent extends Component {
                 {members && (<div>
                   <h5 style={{ display: 'inline' }}>Members</h5> {condition(authUser.uid) && (
                     <button style={{ ...buttonAction, ...addButton }} onClick={this.onToggleAddMemberMode}><IconAdd></IconAdd></button>
-                  )}
+                  )} {
+                    (this.state.team.ownerId && this.state.team.ownerId !== authUser.uid && team.members.includes(authUser.uid)) ? (
+                      <MeetsyButton style={{ width: '130px', marginTop: '10px', marginLeft: '5px'}}
+                        onClick={() => this.onLeaveTeam(team, authUser.uid)}>
+                        Leave Team
+                      </MeetsyButton>
+                    ) :
+                      <span></span>
+                  }
                   <Grid container spacing={1}> {
                     //  pentru fiecare echipa afisam o componenta corezpunzatoare
                     // de tipul Team
@@ -419,102 +431,95 @@ class TeamComponent extends Component {
                       onChange={this.onChangeEditEmail}
                     />
                     <MeetsyButton
-
                       onClick={() => this.onAddMember(team)}
                     >
                       Add
                     </MeetsyButton>
                   </Modal>
 
-                  {
-                    (this.state.team.ownerId !== authUser.uid && team.members.includes(authUser.uid)) ? (
-                      <MeetsyButton style={{ width: '130px', marginTop: '10px' }}
-                        onClick={() => this.onLeaveTeam(team, authUser.uid)}>
-                        Leave Team
-                      </MeetsyButton>
-                    ) :
-                      <span></span>
-                  }
-                </div>
-                )}
-              </div>
-            )}
-            {team && (<div>
-              <div style={{ marginRight: '10pc' }}>
-                <h3>Scheduled Meetings</h3>
-                <ul>{
-                  meetings.length === 0
-                    ? <li>No meetings yet</li>
-                    :
-                    meetings.map(meeting => (
-                      <div>
-                        <li>
-                          {meeting.title}
-                          <ul>
-                            <li>Start Date: {meeting.startDate.toDate().toLocaleString('en-RO')}</li>
-                            <li>End Date: {meeting.endDate.toDate().toLocaleString('en-RO')}</li>
-                            <li>Meeting address: <a target="_blank" rel="noreferrer" href={meeting.meetingLink}>{meeting.meetingLink}</a></li>
-                          </ul>
-                        </li>
-                        {console.log(meeting)}
-                      </div>
-
-                    ))
-                }
-                </ul>
-              </div>
-
-              {condition(authUser.uid) &&
-                <div>
-                  <form
-                    style={{ ...form, marginRight: '10pc' }}
+                  <Modal show={this.state.addMeeting} handleClose={this.onToggleAddMeeting}>
+                  <form style={{...form, ...{marginTop: '0',boxSizing: 'content-box'}}}
                     onSubmit={this.onAddMeeting}
                   >
-                    <h3>Schedule a new meeting</h3>
+                    <h5>Schedule a new meeting</h5>
                     <br></br>
                     <h6 style={{ textAlign: 'center' }}>Start Date</h6>
-                    <StyledSmallInput
+                    <StyledInput style={{width: '300px'}}
                       type="date"
                       id="eventStartDate"
+                      value = {this.state.startDate}
                       onChange={this.onChangeDate}
-                      placeholder="Start date"
                     />
                     <h6 style={{ textAlign: 'center' }}>Start Time</h6>
-                    <StyledSmallInput
+                    <StyledInput style={{width: '300px'}}
                       type="time"
                       id="eventStartTime"
+                      value = {this.state.startTime}
                       onChange={this.onChangeTime}
                     />
-                    <h6 style={{ textAlign: 'center' }}>Duration</h6>
-                    <StyledSmallInput
+                    
+                    <StyledInput style={{width: '300px'}}
                       type="number"
                       step="0.5"
                       min="0.5"
                       max="10"
+                      value = {this.state.duration}
+                      placeholder = "Duration"
                       id="eventStartTime"
                       onChange={this.onChangeDuration}
                     />
-                    <h6 style={{ textAlign: 'center' }}>Event Title</h6>
-                    <StyledSmallInput
+                   
+                    <StyledInput style={{width: '300px'}}
                       type="text"
                       id="eventTitle"
-                      value={title}
+                      value={this.state.title}
+                      placeholder = "Event title"
                       onChange={(e) => this.onChangeText(e, 'title')}
                     />
-                    <h6 style={{ textAlign: 'center' }}>Event Description</h6>
-                    <StyledSmallTextArea
+                   
+                    <StyledTextArea style={{width: '300px'}}
                       type="textarea"
                       id="eventDescription"
-                      value={description}
+                      value={this.state.description}
+                      placeholder = "Event description"
                       onChange={(e) => this.onChangeText(e, 'description')}
                     />
-                    <StyledSmallButton type="submit">Schedule meeting</StyledSmallButton>
+                    <StyledButton type="submit">Schedule meeting</StyledButton>
 
-                    {success !== null && <p style={successMsg}>{success}</p>}
-                    {error !== null && <p style={errorMsg}>{error}</p>}
-                  </form>
+                   
+                    {this.state.error !== null && <p style={errorMsg}>{this.state.error}</p>}
+                    </form>
+                  </Modal>
 
 
+
+                  
+                </div>
+                )}
+              </div>
+            )}
+            {team && (<div style = {{marginTop: '20px'}}>
+              <div style={{ marginRight: '10pc' }}>
+              <h5 style={{ display: 'inline' }}>Scheduled Meetings</h5>
+              <Grid style={{marginTop: '10px'}} container spacing={1}> {
+                  meetings.length === 0
+                    ? <p style={{fontSize:  '0.9rem', marginLeft: '10px'}}>No meetings yet</p>
+                    :
+                    meetings.map(meeting => (
+                      <OwnerBox style={{justifyContent: 'space-between', marginRight: '10px', marginBottom: '10px'}}>
+                          <p style={{display: 'inline', marginRight: '5px'}}>{meeting.title} </p> <a style={{...blackButton, ...meetButton}} target="_blank" rel="noreferrer" href={meeting.meetingLink}>Join</a>
+                            <p style={{ marginTop: '5px'}}><span style={{color: `#D6D6D6`}}>Starts:</span> {meeting.startDate.toDate().toLocaleString('en-RO')}
+                             <br/><span style={{color: `#D6D6D6`}}>Ends:</span> {meeting.endDate.toDate().toLocaleString('en-RO')}</p>
+                           
+                      </OwnerBox>
+                    ))
+                }
+                </Grid>
+              </div>
+
+              {condition(authUser.uid) &&
+                <div>
+                
                 </div>
               }
             </div>)
@@ -525,8 +530,6 @@ class TeamComponent extends Component {
     );
   }
 }
-
-
 
 
 const ProfileBox = styled.div`

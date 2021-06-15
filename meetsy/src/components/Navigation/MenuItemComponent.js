@@ -2,12 +2,12 @@ import React from 'react';
 import { func, string } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Row } from 'simple-flexbox';
-import { StyleSheet, css } from 'aphrodite';
+import { css } from 'aphrodite';
 import { MenuStyles } from '../../styles';
 
 
 function MenuItemComponent(props) {
-    const { path, icon, title, ...otherProps } = props;
+    const { path, icon } = props;
     const Icon = icon;
     const Path = path;
     return (

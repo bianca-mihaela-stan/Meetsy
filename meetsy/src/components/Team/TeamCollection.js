@@ -3,9 +3,8 @@ import { AuthUserContext } from '../Session';
 import { withFirebase } from '../Firebase';
 import TeamItem from './TeamItem';
 import Grid from "@material-ui/core/Grid";
-import { form } from '../../constants/designConstants';
 import IconAdd from '../../assets/icon-add';
-import { StyledInput, StyledButton, StyledTextArea, buttonAction, addButton, MeetsyButton } from '../../styles';
+import { StyledInput, StyledButton, StyledTextArea, buttonAction, addButton} from '../../styles';
 import Modal from '../Modal';
 
 class TeamCollection extends Component {

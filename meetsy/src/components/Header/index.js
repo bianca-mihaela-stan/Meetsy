@@ -72,42 +72,9 @@ function HeaderComponent({name}) {
 
     return (
         <Row className={classes.container} vertical='center' horizontal='space-between'>
-            {/* Afisam titlul paginii */}
+            
             <span></span>
-            {/* <span className={classes.title}>Meet<span className = {classes.title} style={{color: '#3e6ae1'}}>Sy</span></span> */}
             <Row vertical='center'>
-                {/* ne luam un flexbox pe row aliniat in centru; componenta in sine o sa fie alineata la sfarsitul flexului trecut */}
-                {/* <div className={classes.iconStyles}>
-                    <IconSearch />
-                </div> */}
-                {/* <div className={classes.iconStyles}>
-                    <DropdownComponent
-                        label={<IconBell />}
-                        options={[
-                            {
-                                label: 'Notification #1',
-                                onClick: () => console.log('Notification #1')
-                            },
-                            {
-                                label: 'Notification #2',
-                                onClick: () => console.log('Notification #2')
-                            },
-                            {
-                                label: 'Notification #3',
-                                onClick: () => console.log('Notification #3')
-                            },
-                            {
-                                label: 'Notification #4',
-                                onClick: () => console.log('Notification #4')
-                            }
-                        ]}
-                        position={{
-                            top: 42,
-                            right: -14
-                        }}
-                    />
-                </div> */}
-                {/* <div className={classes.separator}></div> */}
                 <DropdownComponent
                     label={
                         <>
@@ -125,10 +92,6 @@ function HeaderComponent({name}) {
                         {
                             label: 'Settings',
                             onClick: onSettingsClick
-                        },
-                        {
-                            label: 'Logout',
-                            onClick: () => console.log('logout')
                         }
                     ]}
                     position={{

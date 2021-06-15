@@ -52,8 +52,6 @@ const LogoWrapper = styled.div`
 `;
 const Container = styled.div`
 min-width: 500px;
-// backdrop-filter: blur(35px);
-// background-color: rgba(255,255,255,0.35);
 background-color: rgb(19, 21, 22);
 height: 100%;
 display: flex;

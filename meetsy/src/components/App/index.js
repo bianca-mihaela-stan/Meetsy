@@ -20,7 +20,6 @@ import { withAuthentication } from '../Session';
 import HeaderComponent from '../Header';
 import {COLORS} from '../../constants/designConstants';
 import { UserItem, UserList } from '../Users';
-import TeamList from '../Team/TeamList';
 import TeamComponent from '../Team/TeamComponent';
 import TeamCollection from '../Team/TeamCollection';
 import {compose} from 'recompose';
@@ -32,8 +31,6 @@ const styles = StyleSheet.create({
     marginTop: 54
   },
   mainBlock: {
-      // backgroundColor: '#F7F8FC',
-      // #1C1F21 #131516 
       backgroundColor: '#131516',
       padding: 30,
       minHeight: '100vh',
@@ -112,14 +109,12 @@ class App extends Component {
             <Route path={ROUTES.ACCOUNT} component={AccountPage} />
             <Route path={ROUTES.ADMIN} component={AdminPage} />
             <Route path={ROUTES.CALENDAR} component={CalendarPage} />
-            <Route path={ROUTES.TEAMS} component={TeamList} />
             <Route path={ROUTES.USERS} component={UserList} />
             <Route path={ROUTES.USER_DETAILS} component={UserItem} />
             <Route path={ROUTES.SHOW_TEAMS} component={TeamCollection}/>
             <Route path={ROUTES.CALLERROR} component={CallError}/>
             <Route path="/meet/:url" component={Meet} />
             <Route path="/showteam/:teamId" component={TeamComponent} />
-            {/* <Route path={ROUTES.TEAM} component={TeamComponent}/> */}
           </Column>
         </Row>
       </div>

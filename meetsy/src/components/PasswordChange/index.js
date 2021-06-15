@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { COLORS } from '../../constants/designConstants';
 import { withFirebase } from '../Firebase';
 import { StyleSheet, css } from 'aphrodite';
+import { StyledInput, StyledButton } from '../../styles';
 
 const INITIAL_STATE = {
   passwordOne: '',
@@ -11,7 +12,8 @@ const INITIAL_STATE = {
 };
 
 const inputStyle = {
-  color: 'black'
+  color: 'black',
+  maxWidth: '200px'
 }
 
 const resetBtn = StyleSheet.create({
@@ -62,7 +64,7 @@ class PasswordChangeForm extends Component {
 
     return (
       <form onSubmit={this.onSubmit}>
-        <input
+        <StyledInput
           name="oldPassword"
           value={oldPassword}
           onChange={this.onChange}
@@ -70,7 +72,7 @@ class PasswordChangeForm extends Component {
           placeholder="Old Password"
           style={inputStyle}
         />
-        <input
+        <StyledInput
           name="passwordOne"
           value={passwordOne}
           onChange={this.onChange}
@@ -78,7 +80,7 @@ class PasswordChangeForm extends Component {
           placeholder="New Password"
           style={inputStyle}
         />
-        <input
+        <StyledInput
           name="passwordTwo"
           value={passwordTwo}
           onChange={this.onChange}
@@ -86,14 +88,14 @@ class PasswordChangeForm extends Component {
           placeholder="Confirm New Password"
           style={inputStyle}
         />
-        <button disabled={isInvalid} type="submit"
+        <StyledButton disabled={isInvalid} type="submit"
           className={
             isInvalid
               ? css(resetBtn.disabledBtn)
               : css(resetBtn.enabledBtn)
           }>
           Reset My Password
-        </button>
+        </StyledButton>
 
         {error && <p>{error.message}</p>}
       </form>

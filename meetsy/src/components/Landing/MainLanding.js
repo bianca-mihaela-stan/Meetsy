@@ -5,7 +5,6 @@ import { withAuthorization } from '../Session';
 const MainLanding = () => {
     return (
         <Container>
-            {/* <h1> Reach higher. Join us<br/> to shape the future.</h1> */}
         </Container>
     )
 }

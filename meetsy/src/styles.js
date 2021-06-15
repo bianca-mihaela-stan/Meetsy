@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { COLORS } from './constants/designConstants';
-import { StyleSheet, css } from 'aphrodite';
+import { StyleSheet } from 'aphrodite';
 
 export const
     blackButton= {
@@ -12,13 +12,7 @@ export const
         borderRadius: '32px',
         display: 'inline'
     };
-
-export const errorMsg = {
-  textAlign: 'center',
-  paddingTop: '1pc',
-  paddingBottom: '1pc',
-  color: '#c70000'
-};   
+  
 export const form = {
   marginTop: '10%',
   display: 'flex',
@@ -197,3 +191,27 @@ image: {
     width: 'auto'
 }
 });
+
+export const errorMsg = {
+  textAlign: 'center',
+  paddingTop: '1pc',
+  paddingBottom: '1pc',
+  color: COLORS.error,
+  textWeight: 'bold'
+};
+
+export const successMsg = {
+  textAlign: 'center',
+  paddingTop: '1pc',
+  paddingBottom: '1pc',
+  color: COLORS.success,
+  textWeight: 'bold'
+};
+
+export const StyledCheckbox = styled.input`
+ width: 18px;
+ height: 18px;
+ margin-left:auto !important;
+ margin-right:auto !important;
+ margin: 0.5rem 0;
+`;

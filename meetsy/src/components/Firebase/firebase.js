@@ -10,6 +10,7 @@ import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 import 'firebase/database';
+import { domainName } from "../../constants/domainName";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -21,9 +22,6 @@ const firebaseConfig = {
   appId: "1:1062287763930:web:030fadcbd80694393938e3",
   measurementId: "G-NQJFWHR5GY"
 };
-
-// // Initialize Firebase
-// firebase.initializeApp(firebaseConfig);
 
 
 var SingletonFactory = (function() {
@@ -45,7 +43,7 @@ var SingletonFactory = (function() {
 
   doSignOut = () => {
     this.auth.signOut();
-    window.location.reload();
+    window.location.href = domainName;
   }
 
   doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
@@ -80,7 +78,7 @@ var SingletonFactory = (function() {
 
   team = uid => this.db.doc(`teams/${uid}`);
   teams = () => this.db.collection('teams');
-  // teamMeetings = uid => this.db.collection('teams').doc(uid).collection('meetings');
+
 
   // *** Calendar API ***
 

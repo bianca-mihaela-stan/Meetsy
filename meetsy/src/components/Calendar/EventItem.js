@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
 import styled from 'styled-components';
 import { AuthUserContext } from '../Session';
-import { COLORS, StyledTextArea, StyledInput, StyledButton } from '../../constants/designConstants';
+import { StyledTextArea, StyledInput, StyledButton } from '../../styles';
+import {COLORS} from '../../constants/designConstants';
 
 const Container = styled.div`
 background: ${COLORS.bodyLight};

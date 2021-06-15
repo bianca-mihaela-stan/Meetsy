@@ -2,7 +2,6 @@ import React from 'react';
 import { Component } from 'react';
 import { AuthUserContext, withAuthorization } from '../Session';
 import { PasswordForgetForm } from '../PasswordForget';
-import PasswordChangeForm from '../PasswordChange';
 
 
 class AccountPage extends Component {
@@ -15,8 +14,7 @@ class AccountPage extends Component {
       {authUser => (
         <div>
           <h1>Account: {this.props.firebase.authUser.username}</h1>
-          {/* <PasswordForgetForm /> */}
-          <PasswordChangeForm />
+          <PasswordForgetForm />
         </div>
       )
       }
@@ -26,5 +24,4 @@ class AccountPage extends Component {
 }
 
 const condition = authUser => !!authUser;
-
 export default withAuthorization(condition)(AccountPage);

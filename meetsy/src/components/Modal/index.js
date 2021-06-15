@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Column } from 'simple-flexbox';
+import React  from 'react';
 import styled from 'styled-components';
 import { COLORS } from '../../constants/designConstants';
 import {MeetsyButton} from '../../styles';

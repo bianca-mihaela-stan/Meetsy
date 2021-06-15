@@ -2,7 +2,7 @@ import React from 'react';
 import { func, string } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Row } from 'simple-flexbox';
-import { StyleSheet, css } from 'aphrodite';
+import { css } from 'aphrodite';
 import { MenuStyles } from '../../styles';
 
 

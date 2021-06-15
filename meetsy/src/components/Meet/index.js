@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react'
 import io from 'socket.io-client'
 import { AuthUserContext, withAuthorization } from '../Session';
 import * as ROUTES from '../../constants/routes';
-
 import { IconButton, Badge, Input, Button } from '@material-ui/core'
 import VideocamIcon from '@material-ui/icons/Videocam'
 import VideocamOffIcon from '@material-ui/icons/VideocamOff'
