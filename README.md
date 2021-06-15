@@ -10,7 +10,7 @@
 ✅ source control - 2p
   - <a href="https://github.com/stanbianca/Meetsy/branches">branch creation </a>: one branch for each developer
   - <a href="https://github.com/stanbianca/Meetsy/commit/dbe845c7ca21b3ee2ece5c90621ee72d3a40d072">merge</a>/ <a href = "https://github.com/stanbianca/Meetsy/network">rebase</a>
-  - lots of commits
+  - <a href="https://github.com/stanbianca/Meetsy/commits/main">at least 10 commits </a>
    
 ✅ bug reporting - 1p
   - see <a href = "https://github.com/stanbianca/Meetsy/issues?q=is%3Aissue+is%3Aclosed"> issues </a>
