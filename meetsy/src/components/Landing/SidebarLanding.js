@@ -1,10 +1,8 @@
 import React from 'react'
 import styled from 'styled-components';
-import { Row, Column } from 'simple-flexbox';
+import { Column } from 'simple-flexbox';
 import * as ROUTES from '../../constants/routes';
-import { Component } from 'react';
 import { useHistory } from "react-router-dom";
-// shortcut: rafce
 
 function SidebarLanding() {
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { bool, func, string } from 'prop-types';
+import { func, string } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Row } from 'simple-flexbox';
 import { StyleSheet, css } from 'aphrodite';
@@ -42,13 +42,13 @@ const styles = StyleSheet.create({
 });
 
 function ProfileImage(props) {
-    const { path, content, title, size, ...otherProps } = props;
+    const { path, content, size } = props;
     const Content = content;
     const Path = path;
     return (
         <Link to={Path} className={css(styles.imageCtn)} style={{ width: { size }, height: { size } }}>
             <Row className={css(styles.container)} vertical="center">
-                <img className={css(styles.image)} src={Content} />
+                <img className={css(styles.image)} src={Content} alt="icon" />
             </Row>
         </Link>
     );

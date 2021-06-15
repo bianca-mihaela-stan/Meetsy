@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import { withFirebase } from '../Firebase';
-import { withAuthorization } from '../Session';
 
 class Team extends Component {
   constructor(props) {
@@ -53,21 +52,21 @@ class Team extends Component {
     }
 
     const { members } = this.state;
-    var currentMember = members.find(u => u.userId == memberId);
+    var currentMember = members.find(u => u.userId === memberId);
     var oldTeams = currentMember.teams;
-    console.log(oldTeams);
+    
     this.props.firebase.team(team.uid).update({
-      members: members.map(u => u.userId).filter(id => id != memberId)
+      members: members.map(u => u.userId).filter(id => id !== memberId)
     });
 
     this.props.firebase.user(memberId).update({
-      teams: oldTeams.filter(id => id != team.uid)
+      teams: oldTeams.filter(id => id !== team.uid)
     })
   }
   onLeaveTeam = (team, memberId) => {
     const { members } = this.state;
     this.onRemoveMember(team, memberId)
-    if (members.length == 1) {
+    if (members.length === 1) {
       this.onRemoveTeam(team.uid);
     }
   }
@@ -134,7 +133,7 @@ class Team extends Component {
 
 
   render() {
-    const { authUser, team, firebase } = this.props;
+    const { authUser, team } = this.props;
     const { editMode, editText, members, loading, addMemberMode, userEmail } = this.state;
 
     return (

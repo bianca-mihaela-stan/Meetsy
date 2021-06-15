@@ -21,7 +21,6 @@ import HeaderComponent from '../Header';
 import {COLORS} from '../../constants/designConstants';
 import { UserItem, UserList } from '../Users';
 import TeamList from '../Team/TeamList';
-import Team from '../Team/Team';
 import TeamComponent from '../Team/TeamComponent';
 import TeamCollection from '../Team/TeamCollection';
 import {compose} from 'recompose';

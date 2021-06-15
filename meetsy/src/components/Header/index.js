@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { string } from 'prop-types';
 import { Row } from 'simple-flexbox';
 import { createUseStyles, useTheme } from 'react-jss';

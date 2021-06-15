@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
 import styled from 'styled-components';
 import { AuthUserContext } from '../Session';
-import { COLORS, form, StyledTextArea, StyledInput, StyledButton, StyledCheckbox, errorMsg, successMsg } from '../../constants/designConstants';
-import { unmountComponentAtNode, render } from "react-dom";
+import { COLORS, StyledTextArea, StyledInput, StyledButton } from '../../constants/designConstants';
 
 const Container = styled.div`
 background: ${COLORS.bodyLight};
@@ -151,17 +150,19 @@ class EventItem extends Component {
         var year = date[0];
         var month = date[1] - 1;
         var day = date[2];
+        var hours;
+        var minutes
 
-        if (field == 'startDate') {
-            var hours = new Date(this.state.startDate).getHours();
-            var minutes = new Date(this.state.startDate).getMinutes();
+        if (field === 'startDate') {
+            hours = new Date(this.state.startDate).getHours();
+            minutes = new Date(this.state.startDate).getMinutes();
             date = new Date(year, month, day, hours, minutes).toLocaleString('en-RO', this.options);
             console.log(date);
             this.setState({ newStartDate: date, stringStartDate: event.target.value, newSDset: true });
         }
-        else if (field == 'endDate') {
-            var hours = new Date(this.state.endDate).getHours();
-            var minutes = new Date(this.state.endDate).getMinutes();
+        else if (field === 'endDate') {
+            hours = new Date(this.state.endDate).getHours();
+            minutes = new Date(this.state.endDate).getMinutes();
             date = new Date(year, month, day, hours, minutes).toLocaleString('en-RO', this.options);
             this.setState({ newEndDate: date, stringEndDate: event.target.value, newEDset: true });
         }
@@ -243,7 +244,7 @@ class EventItem extends Component {
                             <h4><strong>Owner:</strong> {ownerUsername}</h4>
                             <h4><strong>Private:</strong> {privateEvent}</h4>
                             {meetingLink !== null && meetingLink !== undefined &&
-                                <h4><strong>Meeting:</strong> <a target="_blank" href={meetingLink}>{meetingLink}</a></h4>
+                                <h4><strong>Meeting:</strong> <a target="_blank" rel="noreferrer" href={meetingLink}>{meetingLink}</a></h4>
                             }
                         </div>
                         }

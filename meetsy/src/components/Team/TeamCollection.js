@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { AuthUserContext } from '../Session';
 import { withFirebase } from '../Firebase';
-import * as ROUTES from '../../constants/routes';
 import TeamItem from './TeamItem';
 import Grid from "@material-ui/core/Grid";
-import { COLORS, form, StyledTextArea, StyledInput, StyledButton } from '../../constants/designConstants';
+import { form, StyledTextArea, StyledInput, StyledButton } from '../../constants/designConstants';
 
 class TeamCollection extends Component {
   constructor(props) {
@@ -151,7 +149,6 @@ class TeamCollection extends Component {
                 this.onCreateTeam(event, authUser)
               }
             >
-              <h4></h4>
               <h4 style={{ 'marginBottom': '10px' }}>Create a new team</h4>
               <StyledInput
                 type="text"

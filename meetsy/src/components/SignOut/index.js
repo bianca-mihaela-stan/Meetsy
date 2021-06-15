@@ -1,6 +1,4 @@
 import React from 'react';
-
-import { StyleSheet, css } from 'aphrodite';
 import { withFirebase } from '../Firebase';
 import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';

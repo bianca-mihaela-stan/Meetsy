@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthUserContext } from '../Session';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import styled from 'styled-components';
-import {COLORS} from '../../constants/designConstants'
+import { COLORS } from '../../constants/designConstants'
 import { StyleSheet, css } from 'aphrodite';
 
 const Container = styled.div`
@@ -24,38 +23,36 @@ h3,p {
 }
 `;
 const classes = StyleSheet.create({
-    blackButton: {
-        padding: '2% 7%',
-        border: 'none',
-        backgroundColor: 'black',
-        color: 'white',
-        textDecoration: 'none',
-        borderRadius: '32px',
-        display: 'inline'
-    }
+  blackButton: {
+    padding: '2% 7%',
+    border: 'none',
+    backgroundColor: 'black',
+    color: 'white',
+    textDecoration: 'none',
+    borderRadius: '32px',
+    display: 'inline'
+  }
 })
 
 
 class TeamItem extends Component {
-  constructor(props) {
-    super(props);
-  }
+  
   render() {
-    const {authUser, team} = this.props;
+    const { team } = this.props;
     return (
       <Container>
-          <h3>{team.name}</h3>
-          { team.description ? <p>{team.description}</p> :
+        <h3>{team.name}</h3>
+        {team.description ? <p>{team.description}</p> :
           <p>The description of the team.</p>}
-          <div>
+        <div>
           <Link className={css(classes.blackButton)}
             to={{
-                    pathname: `${ROUTES.TEAM}/${team.uid}`
-                  }}
-                  >
-                  Details
-                </Link>
-                </div>
+              pathname: `${ROUTES.TEAM}/${team.uid}`
+            }}
+          >
+            Details
+          </Link>
+        </div>
       </Container>
     );
   }

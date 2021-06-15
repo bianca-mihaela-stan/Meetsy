@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Button, IconButton } from '@material-ui/core';
+import { Input, Button } from '@material-ui/core';
 import { withAuthorization } from '../Session';
 import './room.css';
 
@@ -14,11 +14,12 @@ class Room extends Component {
 	handleChange = (e) => this.setState({ url: e.target.value })
 
 	join = () => {
+		var url;
 		if (this.state.url !== "") {
-			var url = this.state.url.split("/")
+			url = this.state.url.split("/")
 			window.location.href = `/meet/${url[url.length-1]}`
 		} else {
-			var url = Math.random().toString(36).substring(2, 7)
+			url = Math.random().toString(36).substring(2, 7)
 			window.location.href = `/meet/${url}`
 		}
 	}

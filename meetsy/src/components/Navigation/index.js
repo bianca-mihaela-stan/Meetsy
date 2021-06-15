@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import SignOutButton from '../SignOut';
 import { Column } from 'simple-flexbox';
 import { StyleSheet, css } from 'aphrodite';
@@ -7,11 +6,9 @@ import * as ROUTES from '../../constants/routes';
 import { AuthUserContext } from '../Session';
 import IconHome from '../../assets/icon-home.js';
 import IconAccount from '../../assets/icon-account.js';
-import IconCall from '../../assets/icon-call.js';
 import IconCalendar from '../../assets/icon-calendar.js';
 import MenuItemComponent from './MenuItemComponent';
 import IconMeeting from '../../assets/icon-meeting.js';
-import ProfileImage from './ProfileImage';
 const styles = StyleSheet.create({
   dummyContainer: {
     marginLeft: '6vw',
@@ -87,17 +84,6 @@ const NavigationAuth = () => (
     </Column>
   </Column>
   </div>
-);
-
-const NavigationNonAuth = () => (
-  <ul>
-    <li>
-      <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-    </li>
-  </ul>
 );
 
 export default Navigation;

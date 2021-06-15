@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import { useParams } from 'react-router';
 
 import { withFirebase } from '../Firebase';
-import { withAuthorization } from '../Session';
 import { AuthUserContext } from '../Session';
 import { withRouter } from "react-router";
 import { compose } from 'recompose';
 import { domainName } from '../../constants/domainName';
-import { COLORS, form, StyledSmallTextArea, StyledSmallInput, StyledSmallButton, errorMsg, successMsg } from '../../constants/designConstants';
+import { form, StyledSmallTextArea, StyledSmallInput, StyledSmallButton, errorMsg, successMsg } from '../../constants/designConstants';
 
 const inputField = {
   color: 'black'
@@ -120,22 +118,22 @@ class TeamComponent extends Component {
     }
 
     const { members } = this.state;
-    var currentMember = members.find(u => u.userId == memberId);
+    var currentMember = members.find(u => u.userId === memberId);
     var oldTeams = currentMember.teams;
     console.log(oldTeams);
     this.props.firebase.team(team.uid).update({
-      members: members.map(u => u.userId).filter(id => id != memberId)
+      members: members.map(u => u.userId).filter(id => id !== memberId)
     });
 
     this.props.firebase.user(memberId).update({
-      teams: oldTeams.filter(id => id != team.uid)
+      teams: oldTeams.filter(id => id !== team.uid)
     })
   }
 
   onLeaveTeam = (team, memberId) => {
     const { members } = this.state;
     this.onRemoveMember(team, memberId)
-    if (members.length == 1) {
+    if (members.length === 1) {
       this.onRemoveTeam(team.uid);
     }
   }
@@ -189,10 +187,9 @@ class TeamComponent extends Component {
           if (doc.data().teams.includes(uid)) {
             // retinem team-urile de acum
             var oldTeams = doc.data().teams;
-            console.log("filtrate", doc.data().userId, oldTeams.filter(id => id != uid));
             // facem update la bd cu team-urile filtrate
             this.props.firebase.user(doc.data().userId).update({
-              teams: oldTeams.filter(id => id != uid)
+              teams: oldTeams.filter(id => id !== uid)
             });
           }
         }
@@ -265,6 +262,11 @@ class TeamComponent extends Component {
     console.log(this.state);
     let { startDate, startTime, duration, title, description } = this.state;
 
+    this.setState({
+      success: null,
+      error: null
+    });
+
     if (startDate === null || startTime === null || duration === null || title === null || description === null) {
       console.log("Invalid")
       console.log(startDate);
@@ -305,8 +307,10 @@ class TeamComponent extends Component {
       description: null,
       startDate: null,
       startTime: null,
-      duration: null
-    })
+      duration: null,
+      success: "Meeting sheduled successfully"
+    });
+
   }
 
   generateMeetingLink() {
@@ -325,7 +329,7 @@ class TeamComponent extends Component {
   }
 
   render() {
-    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings, title, description, startDate, startTime, error } = this.state;
+    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings, title, description, error, success } = this.state;
 
     meetings.sort(this.compare);
 
@@ -434,7 +438,7 @@ class TeamComponent extends Component {
                               <ul>
                                 <li>Start Date: {meeting.startDate.toDate().toLocaleString('en-RO')}</li>
                                 <li>End Date: {meeting.endDate.toDate().toLocaleString('en-RO')}</li>
-                                <li>Meeting address: <a target="_blank" href={meeting.meetingLink}>{meeting.meetingLink}</a></li>
+                                <li>Meeting address: <a target="_blank" rel="noreferrer" href={meeting.meetingLink}>{meeting.meetingLink}</a></li>
                               </ul>
                             </li>
                             {console.log(meeting)}
@@ -491,6 +495,7 @@ class TeamComponent extends Component {
                         />
                         <StyledSmallButton type="submit">Schedule meeting</StyledSmallButton>
 
+                        {success !== null && <p style={successMsg}>{success}</p>}
                         {error !== null && <p style={errorMsg}>{error}</p>}
                       </form>
 

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { StyleSheet, css } from 'aphrodite';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import { compose } from 'recompose';
@@ -202,16 +201,6 @@ const StyledInput = styled.input`
   outline-width: 0;
   // border: 3px solid rgb(62,106,225,0.7);
  }
-`;
-const StyledContainer = styled.div`
-display:flex;
-flex-direction: column;
-align-items: center;
-justify-content:center;
-width: 100%;
-height: 100%;
-padding: 0;
-margin: 0;
 `;
 const inputCtn = {
    display: 'flex',

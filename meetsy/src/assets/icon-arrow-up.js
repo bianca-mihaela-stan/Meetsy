@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default (props) => (
+const arrowIcon = (props) => (
     <svg
         id={props.id}
         width={props.height || '15'}
@@ -23,3 +23,5 @@ export default (props) => (
         />
     </svg>
 );
+
+export default arrowIcon;

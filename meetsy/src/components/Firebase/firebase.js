@@ -58,7 +58,8 @@ class Firebase {
       return query.data();
     }).catch((error) => {
       console.log("No such user!");
-    })
+    });
+    return null;
   }
   user = uid => this.db.doc(`users/${uid}`);
 

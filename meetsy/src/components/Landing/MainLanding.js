@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from "styled-components";
-import { AuthUserContext, withAuthorization } from '../Session';
+import { withAuthorization } from '../Session';
 
 const MainLanding = () => {
     return (

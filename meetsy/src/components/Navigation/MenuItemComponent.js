@@ -1,5 +1,5 @@
 import React from 'react';
-import { bool, func, string } from 'prop-types';
+import { func, string } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Row } from 'simple-flexbox';
 import { StyleSheet, css } from 'aphrodite';

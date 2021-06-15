@@ -538,7 +538,7 @@ class Meet extends Component {
 											: { textAlign: "left" }
 									}>
 										<p style={{ wordBreak: "break-all", color: "black" }}><b>{
-											item.sender !== this.state.username ? item.sender : (this.state.video ? "true" : "false")}</b>: {item.data}</p>
+											item.sender !== this.state.username ? item.sender : "Me"}</b>: {item.data}</p>
 									</div>
 								)) : <p>No message yet</p>}
 							</Modal.Body>

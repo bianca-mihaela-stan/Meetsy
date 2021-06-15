@@ -6,7 +6,7 @@ import './calendar.css';
 import { AuthUserContext } from '../Session';
 import React, { Component } from 'react';
 import EventItem from './EventItem';
-import { COLORS, form, StyledTextArea, StyledInput, StyledButton, StyledCheckbox, errorMsg, successMsg } from '../../constants/designConstants';
+import { form, StyledTextArea, StyledInput, StyledButton, StyledCheckbox, errorMsg, successMsg } from '../../constants/designConstants';
 
 
 moment.locale("en-GB", {
@@ -177,10 +177,10 @@ class MyCalendar extends Component {
         var day = date[2];
         date = new Date(year, month, day)
 
-        if (field == 'startDate') {
+        if (field === 'startDate') {
             this.setState({ startDate: date, startDateSet: true });
         }
-        else if (field == 'endDate') {
+        else if (field === 'endDate') {
             this.setState({ endDate: date, endDateSet: true });
         }
     }
