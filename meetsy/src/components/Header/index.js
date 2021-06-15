@@ -81,7 +81,7 @@ function HeaderComponent({ name, profileImage }) {
                             <span className={classes.name}>{name}</span>
                             <div className={classes.imageCtn}>
                                 <img
-                                    src={profileImage}
+                                    src={profileImage ? profileImage : "https://firebasestorage.googleapis.com/v0/b/meetsy-f287c.appspot.com/o/images%2Fno-profile-picture-default.png?alt=media&token=8d9920f6-2ae1-4a79-88f1-82bbecb7ae6c"}
                                     alt='avatar'
                                     className={classes.image}
                                 />

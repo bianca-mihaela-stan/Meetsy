@@ -160,5 +160,6 @@ sketch
 
 ### other ###
 *.txt
+build
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,react,firebase,node
