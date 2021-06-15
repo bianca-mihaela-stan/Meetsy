@@ -17,7 +17,7 @@
   - see <a href = "https://github.com/stanbianca/Meetsy/issues?q=is%3Aissue+is%3Aclosed"> issues </a>
 
 ✅ build tool - 1p
-  - npm build - preparing the project for deployment
+  - npm run build - preparing the project for deployment
 
 ✅ refactoring, code standards - 1p
   - <a href="https://marketplace.visualstudio.com/items?itemName=planbcoding.vscode-react-refactor">VSCode React Refactor</a> extension
