@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Component } from 'react';
 import { AuthUserContext, withAuthorization } from '../Session';
 import { PasswordForgetForm } from '../PasswordForget';
 import PasswordChangeForm from '../PasswordChange';
+import { COLORS } from '../../constants/designConstants';
 
 class AccountPage extends Component {
   constructor(props) {
@@ -10,7 +11,8 @@ class AccountPage extends Component {
     this.state = {
       selectedFile: null,
       fileUrl: null,
-      progress: 0
+      progress: 0,
+      errorMsg: null
     }
   }
 
@@ -21,6 +23,13 @@ class AccountPage extends Component {
   }
 
   onUploadFile = () => {
+    if (this.state.selectedFile === null) {
+      this.setState({
+        errorMsg: "No file chosen"
+      });
+      return;
+    }
+
     const uploadTask = this.props.firebase.storage.ref(`images/${this.state.selectedFile.name}`).put(this.state.selectedFile);
 
     uploadTask.on(
@@ -41,7 +50,9 @@ class AccountPage extends Component {
           .getDownloadURL()
           .then(url => {
             this.setState({
-              fileUrl: url
+              fileUrl: url,
+              errorMsg: null,
+              successMsg: "Image uploaded successfully."
             });
 
             let id = this.props.firebase.authUser.uid;
@@ -53,17 +64,31 @@ class AccountPage extends Component {
     )
   }
 
+  onRemoveProfilePicture = () => {
+    let id = this.props.firebase.authUser.uid;
+    this.props.firebase.user(id).update({
+      profileImage: ''
+    });
+    this.setState({
+      successMsg: "Image removed successfully."
+    });
+  }
+
   render() {
     return (<AuthUserContext.Consumer>
       {authUser => (
         <div>
           <h1>Account: {this.props.firebase.authUser.username}</h1>
-          <PasswordForgetForm />
+          {/* <PasswordForgetForm /> */}
           <PasswordChangeForm />
           <input type="file" onChange={this.onFileChange} />
           <button onClick={this.onUploadFile}>Upload Profile Image</button>
+          <button onClick={this.onRemoveProfilePicture}>Remove Profile Picture</button>
           <br></br>
           <progress value={this.state.progress} max="100" />
+
+          {this.state.successMsg !== null && <p style={{ color: COLORS.success }}>{this.state.successMsg}</p>}
+          {this.state.errorMsg !== null && <p style={{ color: COLORS.error }}>{this.state.errorMsg}</p>}
         </div>
       )
       }
