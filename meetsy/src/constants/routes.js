@@ -13,3 +13,4 @@ export const USER_DETAILS = '/users/:id';
 export const TEAMS = '/teams';
 export const SHOW_TEAMS = '/team';
 export const TEAM = '/showteam';
+export const CALLERROR = '/joinerror';

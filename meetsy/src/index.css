@@ -6,6 +6,12 @@ p, h1,h2,h3,h4,h5,h6{
   color: white;
   font-family: 'Poppins', sans-serif;;
 }
+
+.modal-header span{
+    color: black;
+    opacity: 1;
+}
+
 html, body {
   height: auto;
 }
@@ -22,3 +28,5 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+

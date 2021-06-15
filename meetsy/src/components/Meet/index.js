@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import io from 'socket.io-client'
 import { AuthUserContext, withAuthorization } from '../Session';
 import * as ROUTES from '../../constants/routes';
@@ -12,12 +12,16 @@ import ScreenShareIcon from '@material-ui/icons/ScreenShare'
 import StopScreenShareIcon from '@material-ui/icons/StopScreenShare'
 import CallEndIcon from '@material-ui/icons/CallEnd'
 import ChatIcon from '@material-ui/icons/Chat'
+import { withFirebase } from '../Firebase';
+import { compose } from 'recompose';
 
 import { message } from 'antd'
 import 'antd/dist/antd.css'
+import './drop.scss';
 
 import { Row } from 'simple-flexbox'
 import Modal from 'react-bootstrap/Modal'
+import Image from 'react-bootstrap/Image'
 import 'bootstrap/dist/css/bootstrap.css'
 import "./meet.css"
 
@@ -34,12 +38,15 @@ var socket = null
 var socketId = null
 var elms = 0
 
+
+
 class Meet extends Component {
 	constructor(props) {
 		super(props)
 
 		this.localVideoref = React.createRef()
-
+		this.file_input = React.createRef()
+		// this.drop_region_container = React.createRef()
 		this.videoAvailable = false
 		this.audioAvailable = false
 
@@ -48,12 +55,19 @@ class Meet extends Component {
 			audio: false,
 			screen: false,
 			showModal: false,
+			showImageUploader: false,
 			screenAvailable: false,
 			messages: [],
 			message: "",
+			uploadedImages: [],
+			previewImages: [],
+			images: [],
+			greenDrop: false,
 			newmessages: 0,
 			askForUsername: true,
-			username: props.firebase.authUser.username
+			username: this.props.firebase.authUser.username,
+			userId: this.props.firebase.authUser.userId,
+			dragHighlight: false,
 		}
 		connections = {}
 
@@ -90,8 +104,8 @@ class Meet extends Component {
 
 	getMedia = () => {
 		this.setState({
-			video: false,  // this.videoAvailable,
-			audio: false   // this.audioAvailable
+			video: false,
+			audio: false
 		}, () => {
 			this.getUserMedia()
 			this.connectToSocketServer()
@@ -277,14 +291,28 @@ class Meet extends Component {
 		socket.on("connect_error", (err) => {
 			console.log(`connect_error due to ${err.message}`);
 		});
+
 		socket.on('signal', this.gotMessageFromServer)
+
 
 		socket.on('connect', () => {
 			console.log('S-a realizat conexiunea!')
-			socket.emit('join-call', window.location.href)
+			console.log("Id: ", this.state.userId);
+			socket.emit('join-call', window.location.href, this.state.userId)
 			socketId = socket.id
 
-			socket.on('chat-message', this.addMessage)
+			socket.on("already-in-call-error", () => {
+				window.location.href = ROUTES.CALLERROR;
+			})
+			socket.on('chat-message', (data, sender, socketIdSender) => {
+				console.log("socket.on(message)")
+				this.addMessage(data, sender, socketIdSender)
+			})
+
+			socket.on('image', (data, sender, socketIdSender) => {
+				console.log("socket.on(image)")
+				this.addImage(data, sender, socketIdSender)
+			})
 
 			socket.on('user-left', (id) => {
 				let video = document.querySelector(`[data-socket="${id}"]`)
@@ -298,7 +326,6 @@ class Meet extends Component {
 			})
 
 			socket.on('user-joined', (id, clients) => {
-				console.log('User-ul a intrat!')
 				clients.forEach((socketListId) => {
 					connections[socketListId] = new RTCPeerConnection(peerConnectionConfig)
 					// Wait for their ice candidate       
@@ -323,7 +350,7 @@ class Meet extends Component {
 
 							let css = {
 								minWidth: cssMesure.minWidth, minHeight: cssMesure.minHeight, maxHeight: "100%", margin: "10px",
-								borderStyle: "solid", borderRadius: "25px", objectFit: "cover"
+								borderStyle: "solid", borderRadius: "15px", objectFit: "cover"
 							}
 							for (let i in css) video.style[i] = css[i]
 
@@ -401,13 +428,115 @@ class Meet extends Component {
 	handleMessage = (e) => this.setState({ message: e.target.value })
 
 	addMessage = (data, sender, socketIdSender) => {
+		console.log("addMessage")
 		this.setState(prevState => ({
-			messages: [...prevState.messages, { "sender": sender, "data": data }],
+			messages: [...prevState.messages, { "sender": sender, "data": data, "type": "txt" }],
 		}))
 		if (socketIdSender !== socketId) {
 			this.setState({ newmessages: this.state.newmessages + 1 })
 		}
 	}
+
+	addImage = (image, sender, socketIdSender) => {
+		console.log("addImage")
+		this.setState(prevState => ({
+			messages: [...prevState.messages, { 'sender': sender, "data": image, "type": "image" }],
+		}))
+		if (socketIdSender !== socketId) {
+			this.setState({ newmessages: this.state.newmessages + 1 })
+		}
+		console.log(this.state.images)
+	}
+
+	// addImage = (image) => {
+	//     this.setState(prevState => ({
+	//         images : [...prevState.images, image]
+	//     }))
+	// }
+
+	openImageUloader = () => this.setState({ showImageUploader: true, showModal: false })
+	closeImageUloader = () => this.setState({ showImageUploader: false, showModal: true })
+
+	preventDefaults = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+
+
+	uploadFile = (files) => {
+		console.log(files)
+		// const formData = new FormData();
+		// this.state.previewImages = this.state.previewImages.concat(files);
+		// const formData = new FormData();
+		files.forEach((file) => {
+			this.setState({ previewImages: this.state.previewImages.concat(file) },
+				() => { console.log(this.state.previewImages) });
+		});
+	};
+
+	removePreviewImage = (e) => {
+		const index = e.target.getAttribute('index');
+		const images = this.state.previewImages;
+		images.splice(index, 1);
+		this.setState(images);
+	};
+
+	previewFile = (data) => {
+		const images = this.state.previewImages;
+		this.setState({ images: images.concat(data) });
+	};
+
+	handleDrop = (e) => {
+		// this.setState({dragHighlight: false})
+		e.preventDefault();
+		const files = e.dataTransfer.files;
+		this.uploadFile(Array.from(files));
+		this.setState({
+			greenDrop: false
+		})
+	};
+
+	handleDragOver = (e) => {
+		// this.setState({dragHighlight: true})
+		e.preventDefault();
+		this.setState({
+			greenDrop: true
+		})
+	};
+
+	handleInputByClick = (e) => {
+		this.uploadFile(Array.from(e.target.files));
+	};
+
+	handleDragEnter = () => {
+		this.setState({
+			greenDrop: true
+		})
+	}
+
+	handleDragLeave = () => {
+		this.setState({
+			greenDrop: false
+		})
+	}
+
+	handleSubmit = () => {
+		this.sumbitPreview()
+	}
+
+	handleClick = (e) => {
+		this.file_input.click();
+	}
+
+
+	sumbitPreview = () => {
+		this.setState({ uploadedImages: this.state.uploadedImages.concat(this.state.previewImages) },
+			() => { console.log(this.state.uploadedImages) });
+
+		this.setState({ previewImages: [] },
+			() => { console.log(this.state.previewImages) });
+	}
+
 
 	handleUsername = (e) => this.setState({ username: e.target.value })
 
@@ -415,6 +544,41 @@ class Meet extends Component {
 		if (this.state.message !== "") {
 			socket.emit('chat-message', this.state.message, this.state.username)
 			this.setState({ message: "", sender: this.state.username })
+		}
+	}
+
+	getBase64 = file => {
+		return new Promise(resolve => {
+			let fileInfo;
+			let baseURL = "";
+			// Make new FileReader
+			let reader = new FileReader();
+
+			// Convert the file to base64 text
+			reader.readAsDataURL(file);
+
+			// on reader load somthing...
+			reader.onload = () => {
+				// Make a fileInfo Object
+				console.log("Called", reader);
+				baseURL = reader.result;
+				console.log(baseURL);
+				resolve(baseURL);
+			};
+			console.log(fileInfo);
+		});
+	};
+
+	sendImages = () => {
+		console.log(this.state.previewImages)
+		console.log(this.state.previewImages.length)
+		console.log(this.state.previewImages.length > 0)
+		if (this.state.previewImages.length > 0) {
+			console.log("sendImages")
+			this.state.previewImages.forEach((image) => {
+				socket.emit('image', URL.createObjectURL(image), this.state.username)
+			})
+			this.setState({ previewImages: [], sender: this.state.username })
 		}
 	}
 
@@ -453,6 +617,29 @@ class Meet extends Component {
 		return matchChrome !== null
 	}
 
+	renderItem(item, index) {
+		if (item.type == "txt") {
+			return <div key={index} style={
+				item.sender === this.state.username
+					? { textAlign: "right" }
+					: { textAlign: "left" }
+			}>
+				<p style={{ wordBreak: "break-all", color: "black" }}><b>{
+					item.sender !== this.state.username ? item.sender : "Me"}</b>: {item.data}</p>
+			</div>
+		}
+		else if (item.type == "image") {
+			return <div key={index} style={
+				item.sender === this.state.username
+					? { textAlign: "right" }
+					: { textAlign: "left" }
+			}>
+				<p style={{ wordBreak: "break-all", color: "black" }}><b>{
+					item.sender !== this.state.username ? item.sender : "Me"}</b>: <br></br><Image src={item.data} className="chat-image" /></p>
+			</div>
+		}
+	}
+
 	render() {
 		if (this.isChrome() === false) {
 			return (
@@ -483,7 +670,7 @@ class Meet extends Component {
 
 						<div style={{ justifyContent: "center", textAlign: "center", paddingTop: "40px" }}>
 							<video id="my-video" ref={this.localVideoref} autoPlay={this.state.video} muted={this.state.audio} style={{
-								borderStyle: "solid", borderColor: "#bdbdbd", objectFit: "fill", width: "60%", height: "30%"
+								borderStyle: "solid", borderRadius: "15px", borderColor: "#bdbdbd", objectFit: "fill", width: "60%", height: "30%"
 							}}></video>
 						</div>
 
@@ -526,25 +713,68 @@ class Meet extends Component {
 							</Badge>
 						</div>
 
-						<Modal show={this.state.showModal} onHide={this.closeChat} style={{ zIndex: "999999", color: "black" }}>
-							<Modal.Header closeButton>
-								<Modal.Title>Chat Room</Modal.Title>
+						<Modal show={this.state.showModal} onHide={this.closeChat} style={{ zIndex: "999999", color: "black !important" }}>
+							<Modal.Header closeButton >
+								<Modal.Title style={{ color: "black" }}>Chat Room</Modal.Title>
 							</Modal.Header>
 							<Modal.Body style={{ overflow: "auto", overflowY: "auto", height: "400px", textAlign: "left", color: "black" }} >
 								{this.state.messages.length > 0 ? this.state.messages.map((item, index) => (
-									<div key={index} style={
-										item.sender === this.state.username
-											? { textAlign: "right" }
-											: { textAlign: "left" }
-									}>
-										<p style={{ wordBreak: "break-all", color: "black" }}><b>{
-											item.sender !== this.state.username ? item.sender : "Me"}</b>: {item.data}</p>
-									</div>
-								)) : <p>No message yet</p>}
+									this.renderItem(item, index)
+								)) : <p style={{ color: "black" }}>No message yet</p>}
 							</Modal.Body>
 							<Modal.Footer className="div-send-msg">
 								<Input placeholder="Message" value={this.state.message} onChange={e => this.handleMessage(e)} />
-								<Button variant="contained" color="primary" style={{ backgroundColor: "#01abf4" }} onClick={this.sendMessage}>Send</Button>
+								<Button variant="contained" color="primary" onClick={this.sendMessage}>Send</Button>
+								<Button variant="contained" color="primary" onClick={this.openImageUloader}>Add picture</Button>
+							</Modal.Footer>
+						</Modal>
+
+						<Modal show={this.state.showImageUploader} onHide={this.closeImageUloader} style={{ zIndex: "999999" }}>
+							<Modal.Header closeButton onclick={this.closeImagesUloader}>
+								<Modal.Title style={{ color: "black" }}>Image uploader</Modal.Title>
+							</Modal.Header>
+							<Modal.Body style={{ overflow: "auto", overflowY: "auto", height: "400px", textAlign: "left" }} >
+								<div className='App'>
+									<div className='drop-container'>
+										<div
+											id='drop-region-container'
+											className={'drop-region-container mx-auto'}
+											onDrop={this.handleDrop}
+											onDragOver={this.handleDragOver}
+											onDragEnter={this.handleDragEnter}
+											onDragLeave={this.handleDragLeave}
+											onClick={this.handleClick}
+										>
+											<div id='drop-region' className='drop-region text-center'>
+												<img id='download-btn' src='/Download.png' width='80' alt='' />
+												<h2>Drag and Drop or Click to Upload</h2>
+												<input
+													id='file-input'
+													type='file'
+													ref={input => this.file_input = input}
+													onChange={this.handleInputByClick}
+												/>
+											</div>
+										</div>
+
+										<div id='preview' className='mx-auto'>
+											{this.state.previewImages.map((img, index) => (
+												<Fragment key={index}>
+													<img src={URL.createObjectURL(img)} alt='' />
+													<button
+														className='btn btn-danger btn-block mx-auto'
+														onClick={this.removePreviewImage}
+													>
+														Delete
+													</button>
+												</Fragment>
+											))}
+										</div>
+									</div>
+								</div>
+							</Modal.Body>
+							<Modal.Footer className="div-send-msg">
+								<Button variant="contained" color="primary" onClick={this.sendImages}>Sumbit</Button>
 							</Modal.Footer>
 						</Modal>
 
@@ -559,21 +789,9 @@ class Meet extends Component {
 
 							<Row id="main" className="flex-container" style={{ margin: 0, padding: 0 }}>
 								<video id="my-video" ref={this.localVideoref} autoPlay={this.state.video} muted={this.state.audio} style={{
-									borderStyle: "solid", borderRadius: "25px", margin: "10px", objectFit: "cover",
+									borderStyle: "solid", borderRadius: "15px", margin: "10px", objectFit: "cover",
 									width: "100%", height: "100%"
 								}}></video>
-								{/*
-								// {this.state.video
-								//?
-								// video
-								// :
-								// <div style={{
-								// 	borderStyle: "solid", borderRadius: "25px", margin: "10px", objectFit: "cover",
-								// 	width: "100%", height: "100%", display: "flex", justifyContent: "center", flexDirection: "column"
-								// }}>
-								// 	<p style={{ textAlign: "center"}}>{this.state.username}</p>
-								// </div>
-								// } */}
 							</Row>
 						</div>
 					</div>
@@ -584,4 +802,4 @@ class Meet extends Component {
 }
 
 const condition = authUser => !!authUser;
-export default withAuthorization(condition)(Meet);
+export default compose(withFirebase, withAuthorization(condition))(Meet);

@@ -9,7 +9,9 @@ var xss = require("xss")
 var server = http.createServer(app)
 var io = require('socket.io')(server)
 
-app.use(cors())
+app.use(cors({
+    origin: '*'
+  }))
 app.use(bodyParser.json())
 
 if (process.env.NODE_ENV === 'production') {
@@ -26,11 +28,28 @@ sanitizeString = (str) => {
 
 connections = {}
 messages = {}
+images = {}
 timeOnline = {}
+participants = {}
 
 io.on('connection', (socket) => {
-
-    socket.on('join-call', (path) => {
+    console.log("conn");
+    socket.on('join-call', (path, userId) => {
+        
+        console.log("Id-ul este: ", userId);
+        console.log("Participanti:", participants);
+        // vendors.filter(function(e) { return e.Name === 'Magenic'; }).length > 0
+        if(participants[path] && participants[path].filter(function(el) { return el.id === userId}).length > 0)
+             io.to(socket.id).emit("already-in-call-error");
+        else
+        { 
+            console.log({id : userId, sockid : socket.id})
+            if(participants[path])
+                   participants[path].push({id : userId, sockid : socket.id});
+            else 
+               participants[path] = [{id : userId, sockid : socket.id}];
+        
+        console.log(participants);
         if (connections[path] === undefined) {
             connections[path] = []
         }
@@ -39,7 +58,7 @@ io.on('connection', (socket) => {
         timeOnline[socket.id] = new Date()
 
         for (let a = 0; a < connections[path].length; ++a) {
-            io.to(connections[path][a]).emit("user-joined", socket.id, connections[path])
+            io.to(connections[path][a]).emit("user-joined", socket.id, connections[path], userId)
         }
 
         if (messages[path] !== undefined) {
@@ -48,8 +67,8 @@ io.on('connection', (socket) => {
                     messages[path][a]['sender'], messages[path][a]['socket-id-sender'])
             }
         }
-
         console.log(path, connections[path])
+       }
     })
 
     socket.on('signal', (toId, message) => {
@@ -84,14 +103,44 @@ io.on('connection', (socket) => {
         }
     })
 
+    socket.on('image', (data, sender) => {
+        data = sanitizeString(data)
+        sender = sanitizeString(sender)
+
+        var key
+        var ok = false
+        for (const [k, v] of Object.entries(connections)) {
+            for (let a = 0; a < v.length; ++a) {
+                if (v[a] === socket.id) {
+                    key = k
+                    ok = true
+                }
+            }
+        }
+
+        if (ok === true) {
+            if (images[key] === undefined) {
+                images[key] = []
+            }
+            images[key].push({ "sender": sender, "data": data, "socket-id-sender": socket.id })
+            console.log("image", key, ":", sender, data)
+
+            for (let a = 0; a < connections[key].length; ++a) {
+                io.to(connections[key][a]).emit("image", data, sender, socket.id)
+            }
+        }
+    })
+
     socket.on('disconnect', () => {
         var diffTime = Math.abs(timeOnline[socket.id] - new Date())
+
         var key
         for (const [k, v] of JSON.parse(JSON.stringify(Object.entries(connections)))) {
             for (let a = 0; a < v.length; ++a) {
                 if (v[a] === socket.id) {
                     key = k
-
+                    
+                    
                     for (let a = 0; a < connections[key].length; ++a) {
                         io.to(connections[key][a]).emit("user-left", socket.id)
                     }
@@ -99,10 +148,15 @@ io.on('connection', (socket) => {
                     var index = connections[key].indexOf(socket.id)
                     connections[key].splice(index, 1)
 
+                    participants[key] = participants[key].filter(function(el) { return el.sockid !== socket.id})
+                    console.log("Noi participanti:", participants);
                     console.log(key, socket.id, Math.ceil(diffTime / 1000))
 
+                    if(participants[key].length == 0){
+                        delete participants[key];
+                    }
                     if (connections[key].length === 0) {
-                        delete connections[key]
+                        delete connections[key];
                     }
                 }
             }

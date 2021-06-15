@@ -3,7 +3,10 @@ import { AuthUserContext } from '../Session';
 import { withFirebase } from '../Firebase';
 import TeamItem from './TeamItem';
 import Grid from "@material-ui/core/Grid";
-import { form, StyledTextArea, StyledInput, StyledButton } from '../../constants/designConstants';
+import { form } from '../../constants/designConstants';
+import IconAdd from '../../assets/icon-add';
+import { StyledInput, StyledButton, StyledTextArea, buttonAction, addButton, MeetsyButton } from '../../styles';
+import Modal from '../Modal';
 
 class TeamCollection extends Component {
   constructor(props) {
@@ -18,7 +21,9 @@ class TeamCollection extends Component {
       name: '',
       loading: false,
       teams: [],
-      description: ''
+      description: '',
+      succesfullAdd: false,
+      addCourse: false
     };
   }
   // este chemata imediata ce componenta este mounted (este adaugata in DOM)
@@ -84,13 +89,21 @@ class TeamCollection extends Component {
         this.props.firebase.user(authUser.uid).update({
           teams: newTeams
         })
-        this.setState({ name: '', description: '' });
+        this.setState({ name: '', description: '', addCourse: false });
         this.setState()
+
       })
     })
       .catch((error) => {
         console.error("Error creating team: ", error);
       });
+
+  };
+  onToggleAddCourse = () => {
+    const newValue = !this.state.addCourse;
+    this.setState({
+      addCourse: newValue
+    }, () => { console.log(this.state.addCourse); });
 
   };
 
@@ -120,7 +133,9 @@ class TeamCollection extends Component {
       <AuthUserContext.Consumer>
         {authUser => (
           <div>
-            <h2>Teams</h2>
+            <h2 style={{ display: 'inline' }}>Teams</h2>
+            <button style={{ ...buttonAction, ...addButton }} onClick={this.onToggleAddCourse}><IconAdd></IconAdd></button>
+
             {/* afisam mesajul de loading cat timp informatiile se incarca
         din bd */}
             {loading && <div>Loading ...</div>}
@@ -144,27 +159,32 @@ class TeamCollection extends Component {
 
             {/*onCreateTeam trebuie sa primeasca si event ca sa putem
           preveni actiunea default a submisiei  */}
-            <form style={form}
-              onSubmit={event =>
-                this.onCreateTeam(event, authUser)
-              }
-            >
-              <h4 style={{ 'marginBottom': '10px' }}>Create a new team</h4>
-              <StyledInput
-                type="text"
-                value={name}
-                placeholder='Name'
-                onChange={this.onChangeText}
-              />
-              <StyledTextArea
-                type="text"
-                value={description}
-                placeholder='Description'
-                onChange={this.onChangeDescription}
-              />
-              <StyledButton type="submit">Create Team</StyledButton>
-            </form> </div>
-        )}
+
+            <Modal show={this.state.addCourse} handleClose={this.onToggleAddCourse}>
+              <form
+                onSubmit={event =>
+                  this.onCreateTeam(event, authUser)
+                }
+              >
+                <h4 style={{ 'marginBottom': '10px' }}>Create a new course</h4>
+                <StyledInput
+                  type="text"
+                  value={name}
+                  placeholder='Name'
+                  onChange={this.onChangeText}
+                />
+                <StyledTextArea
+                  type="text"
+                  value={description}
+                  placeholder='Description'
+                  onChange={this.onChangeDescription}
+                />
+                <StyledButton type="submit">Create Team</StyledButton>
+              </form>
+            </Modal>
+          </div>
+        )
+        }
       </AuthUserContext.Consumer>
     );
   }

@@ -25,6 +25,7 @@ import TeamComponent from '../Team/TeamComponent';
 import TeamCollection from '../Team/TeamCollection';
 import {compose} from 'recompose';
 import LoadingScreen from 'react-loading-screen';
+import CallError from '../CallError';
 const styles = StyleSheet.create({
 
   content: {
@@ -46,7 +47,8 @@ class App extends Component {
   }
   componentDidMount(){
     this.props.firebase.auth.onAuthStateChanged(authUser => {
-      console.log("Out here!");
+      this.setState({loading: true})
+      console.log("Out here!", this.state.loading);
        if (authUser) {
          console.log("In here!");
          this.props.firebase.user(authUser.uid)
@@ -66,10 +68,12 @@ class App extends Component {
                providerData: authUser.providerData,
                ...dbUser,
              };
+             console.log("Loading-ul este: " , this.state.loading)
              console.log(this.props.firebase.authUser);  
              this.setState({loading: false})      
            });
        } else {
+          console.log("Loading-ul este pe callback: ", this.state.loading)
           this.setState({loading:false})
        }
      });
@@ -93,7 +97,7 @@ class App extends Component {
         <Column flexGrow={1} className={css(styles.mainBlock)}>
         <AuthUserContext.Consumer>
         {authUser =>
-          authUser ? <HeaderComponent/> : void 0
+          authUser && this.state.loading === false && this.props.firebase.authUser? <HeaderComponent name ={this.props.firebase.authUser.username}/> : void 0
         }
       </AuthUserContext.Consumer>
             <Route exact path={ROUTES.LANDING} component={LandingPage} />
@@ -112,6 +116,7 @@ class App extends Component {
             <Route path={ROUTES.USERS} component={UserList} />
             <Route path={ROUTES.USER_DETAILS} component={UserItem} />
             <Route path={ROUTES.SHOW_TEAMS} component={TeamCollection}/>
+            <Route path={ROUTES.CALLERROR} component={CallError}/>
             <Route path="/meet/:url" component={Meet} />
             <Route path="/showteam/:teamId" component={TeamComponent} />
             {/* <Route path={ROUTES.TEAM} component={TeamComponent}/> */}

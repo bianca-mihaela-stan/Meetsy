@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Column } from 'simple-flexbox';
 import * as ROUTES from '../../constants/routes';
 import { useHistory } from "react-router-dom";
+import {StyledButton} from '../../styles';
 
 function SidebarLanding() {
 
@@ -32,24 +33,7 @@ function SidebarLanding() {
     </Container>
   )
 }
-const StyledButton = styled.button`
-  width: 75%;
-  max-width: 350px;
-  min-width: 250px;
-  height: 40px;
-  border: none;
-  margin: 1rem 0;
-  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
-  border-radius: 32px;
-  background-color: #3e6ae1;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: center;
-  &:hover {
-    background-color: #3457b1;
-  }
-`;
+
 const LogoWrapper = styled.div`
   h3 
   {
