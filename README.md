@@ -18,6 +18,7 @@
 
 ✅ build tool - 1p
   - npm run build - preparing the project for deployment
+  - https://meetsy-f287c.firebaseapp.com/
 
 ✅ refactoring, code standards - 1p
   - <a href="https://marketplace.visualstudio.com/items?itemName=planbcoding.vscode-react-refactor">VSCode React Refactor</a> extension
