@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { withFirebase } from '../Firebase';
 import { AuthUserContext } from '../Session';
@@ -9,23 +8,15 @@ import { domainName } from '../../constants/domainName';
 import { form, StyledSmallTextArea, StyledSmallInput, StyledSmallButton, errorMsg, successMsg } from '../../constants/designConstants';
 
 import styled from 'styled-components';
-import { css } from 'react-loading-screen/node_modules/styled-components';
-import { Column, Row } from 'simple-flexbox';
 import Grid from "@material-ui/core/Grid";
-import { Button } from 'bootstrap';
 import { COLORS } from '../../constants/designConstants';
 import Modal from '../Modal';
-import { StyleSheet } from 'aphrodite';
 import IconDelete from '../../assets/icon-delete';
 import IconEdit from '../../assets/icon-edit';
 import IconBack from '../../assets/icon-back';
 import IconAdd from '../../assets/icon-add';
 import * as ROUTES from '../../constants/routes';
-import { StyledInput, addButton, buttonAction, ButtonGroup, backButton, MeetsyButton, StyledButton } from '../../styles';
-
-const inputField = {
-  color: 'black'
-}
+import { StyledInput, addButton, buttonAction, ButtonGroup, backButton, MeetsyButton } from '../../styles';
 
 class TeamComponent extends Component {
   constructor(props) {
@@ -161,7 +152,6 @@ class TeamComponent extends Component {
     }
   }
 
-
   onAddMember = (team) => {
     const { members } = this.state;
     this.props.firebase.userByEmail(this.state.userEmail).get().then(query => {
@@ -278,12 +268,6 @@ class TeamComponent extends Component {
     });
 
     if (startDate === null || startTime === null || duration === null || title === null || description === null) {
-      console.log("Invalid")
-      console.log(startDate);
-      console.log(startTime);
-      console.log(duration);
-      console.log(title);
-      console.log(description);
       this.setState({ error: "Invalid field value" });
       return;
     }
@@ -339,7 +323,7 @@ class TeamComponent extends Component {
   }
 
   render() {
-    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings, title, description, error, success } = this.state;
+    const { editMode, editText, members, loading, userEmail, team, loadingTeam, condition, meetings, title, description, error, success } = this.state;
 
     meetings.sort(this.compare);
 

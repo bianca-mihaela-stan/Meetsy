@@ -61,7 +61,7 @@ const useStyles = createUseStyles((theme) => ({
     }
 }));
 
-function HeaderComponent({name}) {
+function HeaderComponent({ name, profileImage }) {
     const theme = useTheme();
     let history = useHistory();
     const classes = useStyles({ theme });
@@ -112,12 +112,12 @@ function HeaderComponent({name}) {
                     label={
                         <>
                             <span className={classes.name}>{name}</span>
-                            <div className = {classes.imageCtn}>
-                            <img
-                                src='https://hips.hearstapps.com/harpersbazaaruk.cdnds.net/17/03/1484755929-taylor-hill.jpg'
-                                alt='avatar'
-                                className={classes.image}
-                            />
+                            <div className={classes.imageCtn}>
+                                <img
+                                    src={profileImage}
+                                    alt='avatar'
+                                    className={classes.image}
+                                />
                             </div>
                         </>
                     }
