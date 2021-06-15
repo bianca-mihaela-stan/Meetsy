@@ -8,7 +8,8 @@ const useStyles = createUseStyles((theme) => ({
     arrowContainer: {
         position: 'absolute',
         top: -19,
-        right: 15
+        right: 15,
+        zIndex: 100
     },
     dropdownButton: {
         alignItems: 'center',
@@ -26,6 +27,7 @@ const useStyles = createUseStyles((theme) => ({
         background: 'white',
         borderRadius: 5,
         minWidth: 170,
+        zIndex: 100,
         padding: 0,
         position: 'absolute',
         width: '100%',

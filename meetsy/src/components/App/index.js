@@ -98,7 +98,7 @@ class App extends Component {
         <Column flexGrow={1} className={css(styles.mainBlock)}>
         <AuthUserContext.Consumer>
         {authUser =>
-          authUser ? <HeaderComponent/> : void 0
+          authUser && this.state.loading === false && this.props.firebase.authUser? <HeaderComponent name ={this.props.firebase.authUser.username}/> : void 0
         }
       </AuthUserContext.Consumer>
             <Route exact path={ROUTES.LANDING} component={LandingPage} />

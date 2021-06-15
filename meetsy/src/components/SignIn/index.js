@@ -8,7 +8,7 @@ import { PasswordForgetLink } from '../PasswordForget';
 import { StyleSheet, css } from 'aphrodite';
 import styled from "styled-components";
 import { withAuthorization } from '../Session';
-
+import {form, inputCtn, StyledButton,SignContainer,  StyledInput, heading, errorMsg} from '../../styles';
 
 const SignInLink = () => (
   <p>
@@ -16,100 +16,12 @@ const SignInLink = () => (
   </p>
 );
 
-const heading = {
-  marginBottom: '2rem',
-  alignSelf: 'center'
-};
-const form = {
-  marginTop: '10%',
-  display: 'flex',
-  width: '100%',
-  flexDirection: 'column',
-  alignContent: 'center',
-  justifyContent: 'center',
-  boxSizing: 'initial'
-};
-const StyledButton = styled.button`
-  width: 75%;
-  max-width: 350px;
-  min-width: 250px;
-  height: 40px;
-  border: none;
-  margin: 1rem 0;
-  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
-  border-radius: 32px;
-  background-color: #01abf4;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: center;
-  &:hover {
-    background-color: #0087e0;
-  }
-`;
-const errorMsg = {
-  textAlign: 'center',
-  paddingTop: '1pc',
-  paddingBottom: '1pc',
-  color: '#c70000'
-};
-
-const Container = styled.div`
-     h4 {
-        font-size: 14px;
-        color: white;
-        marginTop: 2rem;
-     }
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     p 
-     {
-       color: #fff;
-     }
-`;
-const StyledInput = styled.input`
- width: 80%;
- max-width: 350px;
- min-width: 250px;
- height: 40px;
- border: none;
- margin: 0.5rem 0;
- color: #393c41;
- background-color: #f5f5f5;
- box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
- border-radius: 32px;
- padding:  0 1rem;
- &:hover{
-  outline-width: 0;
- }
- &:focus{
-  outline-width: 0;
-  // border: 3px solid rgb(62,106,225,0.7);
- }
-`;
-const StyledContainer = styled.div`
-display:flex;
-flex-direction: column;
-align-items: center;
-justify-content:center;
-width: 100%;
-height: 100%;
-padding: 0;
-margin: 0;
-`;
-const inputCtn = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignContent: 'center'
-};
-
 const SignInPage = () => (
-  <Container>
+  <SignContainer>
     <SignInForm />
     <PasswordForgetLink />
     <SignUpLink />
-  </Container>
+  </SignContainer>
 );
 
 const INITIAL_STATE = {
@@ -154,7 +66,7 @@ class SignInFormBase extends Component {
       <form style={form} onSubmit={this.onSubmit}>
         <h3 style={heading}>Sign in</h3>
         <div style={inputCtn}>
-          <StyledInput
+          <StyledInput style = {{maxWidth: '350px', margin: '0'}}
             name="email"
             value={email}
             onChange={this.onChange}
@@ -162,7 +74,7 @@ class SignInFormBase extends Component {
             placeholder="Email Address"
           /></div>
         <div style={inputCtn}>
-          <StyledInput
+          <StyledInput style = {{maxWidth: '350px', margin: '0'}}
             name="password"
             value={password}
             onChange={this.onChange}

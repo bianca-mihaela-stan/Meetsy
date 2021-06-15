@@ -8,10 +8,8 @@ import {COLORS} from '../../constants/designConstants'
 import { StyleSheet, css } from 'aphrodite';
 
 const Container = styled.div`
-// background: rgb(0,89,124);
-// background: linear-gradient(0deg, rgba(0,89,124,1) 0%, rgba(82,182,154,1) 100%);
-background: rgb(160,58,89);
-background: linear-gradient(0deg, rgba(160,58,89,1) 0%, rgba(255,133,120,1) 100%);
+background: rgb(0,89,124);
+background: linear-gradient(0deg, rgba(0,89,124,1) 0%, rgba(82,182,154,1) 100%);
 margin-top: 10%;
 padding: 10%;
 height: 310px;

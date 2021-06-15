@@ -6,47 +6,11 @@ import * as ROUTES from '../../constants/routes';
 import { compose } from 'recompose';
 import  styled  from "styled-components";
 import { SignInLink } from '../SignIn';
+import { StyledButton,inputCtn, StyledInput, SignContainer, form, heading, errorMsg } from '../../styles';
 
-const heading = {
-           marginBottom: '2rem',
-           alignSelf: 'center'
-     };
-const form = {
-  marginTop: '10%',
-  display: 'flex',
-  width: '100%',
-  flexDirection: 'column',
-  alignContent: 'center',
-  justifyContent: 'center',
-  boxSizing: 'initial'
- };
-const StyledButton  =  styled.button`
-  width: 75%;
-  max-width: 350px;
-  min-width: 250px;
-  height: 40px;
-  border: none;
-  margin: 1rem 0;
-  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
-  border-radius: 32px;
-  background-color: #01abf4;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: center;
-  &:hover {
-    background-color: #0087e0;
-  }
-`;
-const errorMsg = {
-  textAlign: 'center',
-  paddingTop: '1pc',
-  paddingBottom: '1pc',
-  color: '#c70000'
-};
 
 const SignUpPage = () => (
-  <Container>
+  <SignContainer>
     <SignUpForm />
     <div>
         <Terms>
@@ -54,7 +18,7 @@ const SignUpPage = () => (
         </Terms>
       </div>
       <SignInLink/>
-      </Container>
+      </SignContainer>
 );
 const INITIAL_STATE = {
   username: '',
@@ -122,7 +86,7 @@ class SignUpFormBase extends Component {
       <form style={form} onSubmit={this.onSubmit}>
         <h3 style={heading}>Sign up</h3>
         <div style={inputCtn}>
-        <StyledInput
+        <StyledInput style = {{maxWidth: '350px', margin: '0'}}
           name="username"
           value={username}
           onChange={this.onChange}
@@ -130,7 +94,7 @@ class SignUpFormBase extends Component {
           placeholder="Full Name"
         /></div>
         <div style={inputCtn}>
-        <StyledInput
+        <StyledInput style = {{maxWidth: '350px', margin: '0'}}
           name="email"
           value={email}
           onChange={this.onChange}
@@ -138,7 +102,7 @@ class SignUpFormBase extends Component {
           placeholder="Email Address"
         /></div>
         <div style={inputCtn}>
-        <StyledInput
+        <StyledInput style = {{maxWidth: '350px', margin: '0'}}
           name="passwordOne"
           value={passwordOne}
           onChange={this.onChange}
@@ -146,7 +110,7 @@ class SignUpFormBase extends Component {
           placeholder="Password"
         /></div>
         <div style={inputCtn}>
-        <StyledInput
+        <StyledInput style = {{maxWidth: '350px', margin: '0'}}
           name="passwordTwo"
           value={passwordTwo}
           onChange={this.onChange}
@@ -162,20 +126,7 @@ class SignUpFormBase extends Component {
     );
   }
 }
-const Container = styled.div`
-     h4 {
-        font-size: 14px;
-        color: white;
-        marginTop: 2rem;
-     }
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     p 
-     {
-       color: #fff;
-     }
-`;
+
 const Terms = styled.p` 
    padding: 0 1rem;
    text-align: center;
@@ -183,41 +134,7 @@ const Terms = styled.p`
    color: #fff;
    font-weight: 300;
 `;
-const StyledInput = styled.input`
- width: 80%;
- max-width: 350px;
- min-width: 250px;
- height: 40px;
- border: none;
- margin: 0.5rem 0;
- background-color: #f5f5f5;
- box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
- border-radius: 32px;
- padding:  0 1rem;
- color: #393c41;
- &:hover{
-  outline-width: 0;
- }
- &:focus{
-  outline-width: 0;
-  // border: 3px solid rgb(62,106,225,0.7);
- }
-`;
-const StyledContainer = styled.div`
-display:flex;
-flex-direction: column;
-align-items: center;
-justify-content:center;
-width: 100%;
-height: 100%;
-padding: 0;
-margin: 0;
-`;
-const inputCtn = {
-   display: 'flex',
-   justifyContent: 'center',
-   alignContent: 'center'
-};
+
 const SignUpLink = () => (
   <p>
     Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>

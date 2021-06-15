@@ -8,6 +8,8 @@ import bgImg from "../../assets/bg6.jpg";
 import imgpng from "../../assets/elearning.png";
 import { Row, Column } from 'simple-flexbox';
 import {COLORS} from "../../constants/designConstants";
+import * as ROUTES from "../../constants/routes";
+import { withRouter } from 'react-router-dom';
 class Home extends Component {
   constructor(props){
     super(props);
@@ -26,26 +28,28 @@ class Home extends Component {
               <h4>Always reach higher</h4>
               <p>Never stop chasing those dreams. Lorem ipsum lorem ipsum lorem ipsum <br/> 
               lorem ipsum lorem ipsum.</p>
-            <StyledButton>Explore</StyledButton></InnerFirstFrame></FirstFrame>
-            <RowFrame>
+            <StyledButton onClick = {() => {this.props.history.push(ROUTES.SHOW_TEAMS);}}>
+               Explore
+             </StyledButton>
+            </InnerFirstFrame>
+            </FirstFrame>
+            {/* <RowFrame>
             <Frame style={{backgroundColor: '#11917a', backgroundImage: `${imgpng}` }}>
             </Frame>
             <Frame style={{backgroundColor: '#11917a'}}>
             </Frame>
             <Frame>
-              <p style={{fontSize: '200px', marginLeft:'auto', marginRight: 'auto', height: '50%'}}>14</p>
-              <p>June, 2021</p>
               </Frame>
-            </RowFrame> 
+            </RowFrame>  */}
 
         </MainContainer>
      
-      <SideFrame>
+      {/* <SideFrame>
         <h5 style ={{color: 'black', textAlign: 'center', marginTop: '5px'}}>Discover courses</h5>
         <InnerSideFrame>
           
         </InnerSideFrame>
-        </SideFrame>
+        </SideFrame> */}
       </Container>
     </div>
     )
@@ -54,7 +58,7 @@ class Home extends Component {
 
 
 const InnerSideFrame = styled.div`
-width:100%;
+width:70%;
 height: 50%;
 background-color: #EDEDED;
 border-radius: 32px;
@@ -73,6 +77,7 @@ const InnerFirstFrame = styled.div`
   display:flex;
   flex-direction:column;
   padding-left: 10%;
+
 `;
 const StyledButton = styled.button`
   max-width: 150px;
@@ -91,7 +96,7 @@ const StyledButton = styled.button`
   }
 `;
 const MainContainer = styled.div`
-width:100%;height:100%;
+width:100%;height:100%;justify-content:center;
 `;
 const Container = styled.div`
 display:flex;
@@ -111,12 +116,15 @@ flex-direction: column;
 `;
 const FirstFrame = styled.div` 
  margin-top: 3%;
- width: 90%;
+ width: 78%;
  height: 300px;
- background-color: #F78888;
+ background: rgb(0,89,124);
+ background: linear-gradient(0deg, rgba(0,89,124,1) 0%, rgba(82,182,154,1) 100%);
  border-radius: 32px;
  display:flex;
  align-items: center;
+ margin-left:auto;
+ margin-right:auto;
 `;
 const condition = authUser => !!authUser;
-export default compose (withFirebase, withAuthorization(condition))(Home);
+export default compose (withRouter, withFirebase, withAuthorization(condition))(Home);

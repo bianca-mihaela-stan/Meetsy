@@ -61,7 +61,7 @@ const useStyles = createUseStyles((theme) => ({
       }
 }));
 
-function HeaderComponent() {
+function HeaderComponent({name}) {
     const theme = useTheme();
     let history = useHistory();
     const classes = useStyles({ theme });
@@ -78,10 +78,10 @@ function HeaderComponent() {
             {/* <span className={classes.title}>Meet<span className = {classes.title} style={{color: '#3e6ae1'}}>Sy</span></span> */}
             <Row vertical='center'>
                 {/* ne luam un flexbox pe row aliniat in centru; componenta in sine o sa fie alineata la sfarsitul flexului trecut */}
-                <div className={classes.iconStyles}>
+                {/* <div className={classes.iconStyles}>
                     <IconSearch />
-                </div>
-                <div className={classes.iconStyles}>
+                </div> */}
+                {/* <div className={classes.iconStyles}>
                     <DropdownComponent
                         label={<IconBell />}
                         options={[
@@ -107,12 +107,12 @@ function HeaderComponent() {
                             right: -14
                         }}
                     />
-                </div>
-                <div className={classes.separator}></div>
+                </div> */}
+                {/* <div className={classes.separator}></div> */}
                 <DropdownComponent
                     label={
                         <>
-                            <span className={classes.name}>Taylor Hill</span>
+                            <span className={classes.name}>{name}</span>
                             <div className = {classes.imageCtn}>
                             <img
                                 src='https://hips.hearstapps.com/harpersbazaaruk.cdnds.net/17/03/1484755929-taylor-hill.jpg'

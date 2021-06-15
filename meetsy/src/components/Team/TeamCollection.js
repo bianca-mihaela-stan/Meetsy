@@ -8,8 +8,10 @@ import Grid from "@material-ui/core/Grid";
 import styled from 'styled-components';
 import { COLORS } from '../../constants/designConstants';
 import ReactModal from 'react-modal';
-import Modal from 'react-modal';
+import Modal from '../Modal/index';
 import Popup from 'reactjs-popup';
+import IconAdd from '../../assets/icon-add';
+import {StyledInput, StyledButton, StyledTextArea, buttonAction, addButton, MeetsyButton} from '../../styles';
 
 class TeamCollection extends Component {
   constructor(props) {
@@ -25,7 +27,8 @@ class TeamCollection extends Component {
       loading: false,
       teams: [],
       description: '',
-      modalIsOpen: false
+      succesfullAdd: false,
+      addCourse: false
     };
   }
   // este chemata imediata ce componenta este mounted (este adaugata in DOM)
@@ -91,8 +94,9 @@ class TeamCollection extends Component {
       this.props.firebase.user(authUser.uid).update({
         teams: newTeams
       })
-      this.setState({ name: '' , description: ''});
+      this.setState({ name: '' , description: '', addCourse: false});
       this.setState()
+
       })
     })
       .catch((error) => {
@@ -100,10 +104,13 @@ class TeamCollection extends Component {
       });
      
   };
-  /// FOR MODAL
-  openModal = () => { this.setState({modalIsOpen: true});}
-
-  closeModal = () => { this.setState({modalIsOpen: false}); }
+  onToggleAddCourse = () => {
+    const newValue  = !this.state.addCourse;
+    this.setState({
+      addCourse: newValue
+    }, () => {console.log(this.state.addCourse);});
+    
+  };
 
   render() {
     const { name, teams, loading, description } = this.state;
@@ -112,7 +119,9 @@ class TeamCollection extends Component {
       <AuthUserContext.Consumer>
         {authUser => (
           <div>
-            <h2>Teams</h2>
+            <h2 style={{display: 'inline'}}>Teams</h2>
+            <button style={{...buttonAction,...addButton}} onClick={this.onToggleAddCourse}><IconAdd></IconAdd></button>
+                  
             {/* afisam mesajul de loading cat timp informatiile se incarca
         din bd */}
             {loading && <div>Loading ...</div>}
@@ -136,13 +145,8 @@ class TeamCollection extends Component {
             {/*onCreateTeam trebuie sa primeasca si event ca sa putem
           preveni actiunea default a submisiei  */}
       
-
-           {/* <Popup
-    trigger={<button> Open Modal </button>}
-    modal
-  >
-    {close => ( */}
-      <form style={form}
+   <Modal show={this.state.addCourse} handleClose = {this.onToggleAddCourse}>
+       <form 
       onSubmit={event =>
         this.onCreateTeam(event, authUser)
       }
@@ -161,101 +165,17 @@ class TeamCollection extends Component {
         onChange={this.onChangeDescription}
       />
       <StyledButton type="submit">Create Team</StyledButton>
-      
-      {/* <button
-            className="button"
-            onClick={() => {
-              console.log('modal closed ');
-              close();
-            }}
-          >
-            close modal
-          </button> */}
     </form>
-    {/* )}
-  </Popup> */}
+ </Modal>
              </div>
         )}
       </AuthUserContext.Consumer>
     );
   }
 }
-const StyledButton  =  styled.button`
-  max-width: 350px;
-  min-width: 250px;
-  height: 40px;
-  border: none;
-  margin: 1rem 0;
-  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
-  border-radius: 32px;
-  background-color: #3e6ae1;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: center;
-  &:hover {
-    background-color: #3457b1;
-  }
-`;
-const StyledInput = styled.input`
- width: 450px;
- margin-left:auto !important;
- margin-right:auto !important;
 
- height: 40px;
- border: none;
- margin: 0.5rem 0;
- color: #393c41 !important;
- background-color: #f5f5f5;
- box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
- border-radius: 32px;
- padding:  0 1rem;
- &:hover{
-  outline-width: 0;
- }
- &:focus{
-  outline-width: 0;
-  // border: 3px solid rgb(62,106,225,0.7);
- }
-`;
-const StyledTextArea = styled.textarea`
- width: 450px;
- margin-right:auto !important;
- margin-left:auto !important;
- height: 100px;
- border: none;
- margin: 0.5rem 0;
- color: #393c41 !important;
- background-color: #f5f5f5;
- box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
- border-radius: 8px;
- padding:  1rem 1rem;
- &:hover{
-  outline-width: 0;
- }
- &:focus{
-  outline-width: 0;
-  // border: 3px solid rgb(62,106,225,0.7);
- }
-`;
 
-const form = {
-    marginTop: '10%',
-    marginRight: 'auto !important',
-    marginLeft: 'auto !important',
-    padding: '5%',
-    //#13d3df #5577f2
-    backgroundColor: '#53a7e1',
-    boxSizing: 'border-box',
-    display: 'flex',
-    borderRadius: '8px',
-    minWidth: '300px',
-    maxWidth: '600px',
-    flexDirection: 'column',
-    alignContent: 'center',
-    justifyContent: 'right',
-    boxSizing: 'initial'
-   };
+
 // folosim withFirebase pentru a putea accesa data de baza
 // prin intermediul atributului this.props.firebase
 export default withFirebase(TeamCollection);
