@@ -30,6 +30,7 @@ const INITIAL_STATE = {
     privateEvent: null,
     ownerId: null,
     ownerUsername: null,
+    meetingLink: null,
 
     newTitle: null,
     newDescription: null,
@@ -92,6 +93,7 @@ class EventItem extends Component {
                             newStartDate: sd.toLocaleString('en-RO', this.options),
                             newEndDate: ed.toLocaleString('en-RO', this.options),
                             privateEvent: query.data().private.toString(),
+                            meetingLink: query.data().meetingLink,
                             ownerUsername: owner,
                             ownerId: user.data().userId,
                             stringStartDate: this.dateToString(sd),
@@ -225,7 +227,8 @@ class EventItem extends Component {
     }
 
     render() {
-        const { editMode, title, description, startDate, endDate, privateEvent, ownerUsername, loading } = this.state;
+        const { editMode, title, description, startDate, endDate, privateEvent, ownerUsername, loading, meetingLink } = this.state;
+
         return (
             <AuthUserContext.Consumer>
                 {authUser => (
@@ -239,6 +242,9 @@ class EventItem extends Component {
                             <h4><strong>End Date:</strong> {endDate}</h4>
                             <h4><strong>Owner:</strong> {ownerUsername}</h4>
                             <h4><strong>Private:</strong> {privateEvent}</h4>
+                            {meetingLink !== null && meetingLink !== undefined &&
+                                <h4><strong>Meeting:</strong> <a target="_blank" href={meetingLink}>{meetingLink}</a></h4>
+                            }
                         </div>
                         }
                         {!loading && <div>
@@ -309,10 +315,10 @@ class EventItem extends Component {
                                         <span>
                                             <StyledButton type="submit" onClick={this.onSaveExit} style={{ marginRight: '10px' }}>Save</StyledButton>
                                             <StyledButton type="submit" onClick={this.onDeleteEvent} style={{ backgroundColor: COLORS.error }}>Delete Event</StyledButton>
+                                            <span style={{ marginLeft: '1pc', color: COLORS.error }}>* If you delete this event, no one will be able to see it again.</span>
                                         </span>
                                     )
                                     : (
-
                                         <span>
                                             <StyledButton type="submit" onClick={this.onToggleEditMode}>Edit</StyledButton>
                                         </span>

@@ -6,6 +6,8 @@ import { withAuthorization } from '../Session';
 import { AuthUserContext } from '../Session';
 import { withRouter } from "react-router";
 import { compose } from 'recompose';
+import { domainName } from '../../constants/domainName';
+import { COLORS, form, StyledSmallTextArea, StyledSmallInput, StyledSmallButton, errorMsg, successMsg } from '../../constants/designConstants';
 
 const inputField = {
   color: 'black'
@@ -23,11 +25,18 @@ class TeamComponent extends Component {
       members: [],
       team: null,
       loadingTeam: false,
-      condition: null
+      condition: null,
+      meetings: [],
+
+      title: null,
+      description: null,
+      startDate: null,
+      startTime: null,
+      duration: null,
+
+      error: null,
+      success: null
     };
-    console.log(props);
-
-
   }
 
   componentDidMount() {
@@ -50,10 +59,12 @@ class TeamComponent extends Component {
             editText: this.state.team.name
           });
           this.onListenForMembers();
+          this.onListenForMeetings();
         }
       });
 
   }
+
   onListenForMembers = () => {
     this.setState({ loading: true });
     // this.props.firebase.usersByIds(this.props.team.uid)
@@ -72,12 +83,36 @@ class TeamComponent extends Component {
           loading: false,
         });
       });
-
   }
+
+  onListenForMeetings = () => {
+    this.setState({ loading: true });
+    console.log("Listen for Meetings");
+
+    this.unsubscribe = this.props.firebase.meetings()
+      .onSnapshot(snapshot => {
+        let meetings = [];
+
+        snapshot.forEach(doc => {
+          console.log(doc.data());
+          if (doc.data().teamId === this.state.team.uid) {
+            meetings.push({ ...doc.data(), uid: doc.id })
+          }
+        });
+
+        this.setState({
+          meetings: meetings,
+          loading: false
+        });
+
+      });
+  }
+
   componentWillUnmount() {
     // apelam metoda asta ca sa incetam sa ascultam schimbarile colectiei din bd
     this.unsubscribe();
   }
+
   onRemoveMember = (team, memberId) => {
 
     if (this.props.firebase.authUser.uid === memberId) {
@@ -96,6 +131,7 @@ class TeamComponent extends Component {
       teams: oldTeams.filter(id => id != team.uid)
     })
   }
+
   onLeaveTeam = (team, memberId) => {
     const { members } = this.state;
     this.onRemoveMember(team, memberId)
@@ -103,6 +139,7 @@ class TeamComponent extends Component {
       this.onRemoveTeam(team.uid);
     }
   }
+
   onAddMember = (team) => {
     const { members } = this.state;
     this.props.firebase.userByEmail(this.state.userEmail).get().then(query => {
@@ -133,6 +170,7 @@ class TeamComponent extends Component {
       console.log("Error getting document:", error);
     });
   }
+
   onEditTeam = (team, text) => {
     console.log("Echipa este:", team);
     this.props.firebase.team(team.uid).update({
@@ -171,6 +209,7 @@ class TeamComponent extends Component {
       editText: this.state.team.name,
     }));
   };
+
   onToggleAddMemberMode = () => {
     this.setState(state => ({
       addMemberMode: !state.addMemberMode
@@ -180,6 +219,7 @@ class TeamComponent extends Component {
   onChangeEditText = event => {
     this.setState({ editText: event.target.value });
   };
+
   onChangeEditEmail = event => {
     this.setState({ userEmail: event.target.value })
   }
@@ -189,9 +229,106 @@ class TeamComponent extends Component {
     this.setState({ editMode: false });
   };
 
+  onChangeText = (event, field) => {
+    if (field === 'title') {
+      this.setState({ title: event.target.value });
+    }
+    else if (field === 'description') {
+      this.setState({ description: event.target.value });
+    }
+  };
+
+  onChangeTime = event => {
+    let time = event.target.value.split(":");
+    let hours = time[0] * 3600 * 1000; // in miliseconds
+    let minutes = time[1] * 60 * 1000; // in miliseconds
+    this.setState({ startTime: hours + minutes });
+  }
+
+  onChangeDate = event => {
+    let date = event.target.value.split('-');
+    let year = date[0];
+    let month = date[1] - 1;
+    let day = date[2];
+    let newDate = new Date(year, month, day);
+    this.setState({ startDate: newDate });
+  }
+
+  onChangeDuration = event => {
+    let duration = event.target.value;
+    duration = duration * 3600 * 1000;  // milliseconds
+    this.setState({ duration: duration });
+  }
+
+  onAddMeeting = event => {
+    event.preventDefault();
+    console.log(this.state);
+    let { startDate, startTime, duration, title, description } = this.state;
+
+    if (startDate === null || startTime === null || duration === null || title === null || description === null) {
+      console.log("Invalid")
+      console.log(startDate);
+      console.log(startTime);
+      console.log(duration);
+      console.log(title);
+      console.log(description);
+      this.setState({ error: "Invalid field value" });
+      return;
+    }
+
+    startDate.setSeconds(startTime / 1000);
+    let endDate = new Date(startDate.getTime());
+    endDate.setSeconds(duration / 1000);
+
+    let link = this.generateMeetingLink();
+
+    this.props.firebase.events().add({
+      title: title,
+      description: description,
+      startDate: startDate,
+      endDate: endDate,
+      private: false,
+      userId: this.props.firebase.authUser.uid,
+      meetingLink: link
+    });
+
+    this.props.firebase.meetings().add({
+      title: title,
+      startDate: startDate,
+      endDate: endDate,
+      teamId: this.state.team.uid,
+      meetingLink: link
+    });
+
+    this.setState({
+      title: null,
+      description: null,
+      startDate: null,
+      startTime: null,
+      duration: null
+    })
+  }
+
+  generateMeetingLink() {
+    var link = domainName + 'meet/';
+    link += this.state.team.uid + '-';
+    link += this.state.title.replaceAll(' ', '-');
+    return link;
+  }
+
+  compare(a, b) {
+    if (a.title.toLowerCase() < b.title.toLowerCase())
+      return -1;
+    if (a.title.toLowerCase() > b.title.toLowerCase())
+      return 1;
+    return 0;
+  }
 
   render() {
-    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition } = this.state;
+    const { editMode, editText, members, loading, addMemberMode, userEmail, team, loadingTeam, condition, meetings, title, description, startDate, startTime, error } = this.state;
+
+    meetings.sort(this.compare);
+
     return (
       <AuthUserContext.Consumer>
         {authUser => (
@@ -234,53 +371,133 @@ class TeamComponent extends Component {
                   </span>
                 )}
                 {loading && <div>Loading ...</div>}
-                {members && (<div>
-                  <h3>Team members</h3>
-                  <ul> {
-                    //  pentru fiecare echipa afisam o componenta corezpunzatoare
-                    // de tipul Team
-                    members.map(member => (
+                {members && (<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div>
+                    <h3>Team members</h3>
+                    <ul> {
+                      //  pentru fiecare echipa afisam o componenta corezpunzatoare
+                      // de tipul Team
+                      members.map(member => (
+                        <div>
+                          <li>{member.email}</li>
+                          {condition(authUser.uid) && !editMode && this.props.firebase.authUser.email !== member.email && (
+                            <button
+                              type="button"
+                              onClick={() => this.onRemoveMember(team, member.userId)}
+                            >
+                              Delete Member
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </ul>
+                    {condition(authUser.uid) && (addMemberMode ? (
                       <div>
-                        <li>{member.email}</li>
-                        {condition(authUser.uid) && !editMode && this.props.firebase.authUser.email !== member.email && (
-                          <button
-                            type="button"
-                            onClick={() => this.onRemoveMember(team, member.userId)}
-                          >
-                            Delete Member
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </ul>
-                  {condition(authUser.uid) && (addMemberMode ? (
+                        <input
+                          type="text"
+                          value={userEmail}
+                          onChange={this.onChangeEditEmail}
+                          style={inputField}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => this.onAddMember(team)}
+                        >
+                          Add
+                        </button>
+                        <button onClick={this.onToggleAddMemberMode}>Close</button>
+                      </div>)
+                      :
+                      <button onClick={this.onToggleAddMemberMode}>Add member</button>
+                    )}
+                    {
+                      (!!(condition(authUser.id)) && team.members.includes(authUser.uid)) ? (
+                        <button type="button"
+                          onClick={() => this.onLeaveTeam(team, authUser.uid)}>
+                          Leave Team
+                        </button>
+                      ) :
+                        <span></span>
+                    }
+                  </div>
+
+                  <div style={{ marginRight: '10pc' }}>
+                    <h3>Scheduled Meetings</h3>
+                    <ul>{
+                      meetings.length === 0
+                        ? <li>No meetings yet</li>
+                        :
+                        meetings.map(meeting => (
+                          <div>
+                            <li>
+                              {meeting.title}
+                              <ul>
+                                <li>Start Date: {meeting.startDate.toDate().toLocaleString('en-RO')}</li>
+                                <li>End Date: {meeting.endDate.toDate().toLocaleString('en-RO')}</li>
+                                <li>Meeting address: <a target="_blank" href={meeting.meetingLink}>{meeting.meetingLink}</a></li>
+                              </ul>
+                            </li>
+                            {console.log(meeting)}
+                          </div>
+
+                        ))
+                    }
+                    </ul>
+                  </div>
+
+                  {condition(authUser.uid) &&
                     <div>
-                      <input
-                        type="text"
-                        value={userEmail}
-                        onChange={this.onChangeEditEmail}
-                        style={inputField}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => this.onAddMember(team)}
+                      <form
+                        style={{ ...form, marginRight: '10pc' }}
+                        onSubmit={this.onAddMeeting}
                       >
-                        Add
-                      </button>
-                      <button onClick={this.onToggleAddMemberMode}>Close</button>
-                    </div>)
-                    :
-                    <button onClick={this.onToggleAddMemberMode}>Add member</button>
-                  )}
-                  {
-                    (!!(condition(authUser.id)) && team.members.includes(authUser.uid)) ? (
-                      <button type="button"
-                        onClick={() => this.onLeaveTeam(team, authUser.uid)}>
-                        Leave Team
-                      </button>
-                    ) :
-                      <span></span>
+                        <h3>Schedule a new meeting</h3>
+                        <br></br>
+                        <h6 style={{ textAlign: 'center' }}>Start Date</h6>
+                        <StyledSmallInput
+                          type="date"
+                          id="eventStartDate"
+                          onChange={this.onChangeDate}
+                          placeholder="Start date"
+                        />
+                        <h6 style={{ textAlign: 'center' }}>Start Time</h6>
+                        <StyledSmallInput
+                          type="time"
+                          id="eventStartTime"
+                          onChange={this.onChangeTime}
+                        />
+                        <h6 style={{ textAlign: 'center' }}>Duration</h6>
+                        <StyledSmallInput
+                          type="number"
+                          step="0.5"
+                          min="0.5"
+                          max="10"
+                          id="eventStartTime"
+                          onChange={this.onChangeDuration}
+                        />
+                        <h6 style={{ textAlign: 'center' }}>Event Title</h6>
+                        <StyledSmallInput
+                          type="text"
+                          id="eventTitle"
+                          value={title}
+                          onChange={(e) => this.onChangeText(e, 'title')}
+                        />
+                        <h6 style={{ textAlign: 'center' }}>Event Description</h6>
+                        <StyledSmallTextArea
+                          type="textarea"
+                          id="eventDescription"
+                          value={description}
+                          onChange={(e) => this.onChangeText(e, 'description')}
+                        />
+                        <StyledSmallButton type="submit">Schedule meeting</StyledSmallButton>
+
+                        {error !== null && <p style={errorMsg}>{error}</p>}
+                      </form>
+
+
+                    </div>
                   }
+
                 </div>
                 )}
               </div>

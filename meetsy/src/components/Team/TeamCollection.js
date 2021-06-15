@@ -107,7 +107,6 @@ class TeamCollection extends Component {
   render() {
     const { name, teams, loading, description } = this.state;
     teams.sort(this.compare);
-    var date;
 
     this.props.firebase.events().onSnapshot(snapshot => {
       let evs = [];

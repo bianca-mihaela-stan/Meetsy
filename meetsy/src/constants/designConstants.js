@@ -112,3 +112,64 @@ export const StyledCheckbox = styled.input`
  margin-right:auto !important;
  margin: 0.5rem 0;
 `;
+
+export const StyledSmallInput = styled.input`
+ width: 250px;
+ margin-left:auto !important;
+ margin-right:auto !important;
+
+ height: 40px;
+ border: none;
+ margin: 0.5rem 0;
+ color: #393c41 !important;
+ background-color: #f5f5f5;
+ box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
+ border-radius: 32px;
+ padding:  0 1rem;
+ &:hover{
+  outline-width: 0;
+ }
+ &:focus{
+  outline-width: 0;
+  // border: 3px solid rgb(62,106,225,0.7);
+ }
+`;
+
+export const StyledSmallButton = styled.button`
+  max-width: 250px;
+  min-width: 100px;
+  height: 40px;
+  border: none;
+  margin: 1rem 0;
+  box-shadow: 0px 14px 9 px -15px rgba(0,0,0,0.25);
+  border-radius: 32px;
+  background-color: #3e6ae1;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  &:hover {
+    background-color: #3457b1;
+  }
+`;
+
+export const StyledSmallTextArea = styled.textarea`
+ width: 250px;
+ margin-right:auto !important;
+ margin-left:auto !important;
+ height: 100px;
+ border: none;
+ margin: 0.5rem 0;
+ color: #393c41 !important;
+ background-color: #f5f5f5;
+ box-shadow:  0px 14px 9px -15px rgba(0,0,0,0.25);
+ border-radius: 8px;
+ padding:  1rem 1rem;
+ &:hover{
+  outline-width: 0;
+ }
+ &:focus{
+  outline-width: 0;
+  // border: 3px solid rgb(62,106,225,0.7);
+ }
+`;

@@ -35,9 +35,6 @@ class Firebase {
 
   }
   // *** Auth API ***
-
-
-
   doCreateUserWithEmailAndPassword = (email, password) =>
     this.auth.createUserWithEmailAndPassword(email, password);
 
@@ -80,11 +77,16 @@ class Firebase {
 
   team = uid => this.db.doc(`teams/${uid}`);
   teams = () => this.db.collection('teams');
+  // teamMeetings = uid => this.db.collection('teams').doc(uid).collection('meetings');
 
   // *** Calendar API ***
 
   event = uid => this.db.doc(`events/${uid}`);
   events = () => this.db.collection('events');
+
+  // *** Meeting API ***
+  meeting = uid => this.db.doc(`meetings/${uid}`);
+  meetings = () => this.db.collection('meetings');
 
 }
 
