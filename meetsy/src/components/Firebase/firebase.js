@@ -10,7 +10,8 @@ import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 import 'firebase/database';
-import 'firebase/storage'
+import 'firebase/storage';
+import { getInstance } from "antd/lib/message";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -33,9 +34,9 @@ var SingletonFactory = (function () {
     constructor() {
       firebase.initializeApp(firebaseConfig);
 
-      this.auth = firebase.auth();
-      this.db = firebase.firestore();
-      this.storage = firebase.storage();
+    this.auth = firebase.auth();
+    this.db = firebase.firestore();
+    this.storage = firebase.storage();
 
     }
     // *** Auth API ***
@@ -105,4 +106,6 @@ var SingletonFactory = (function () {
     }
   }
 })();
-export default SingletonFactory;
+
+
+export {SingletonFactory as default};
