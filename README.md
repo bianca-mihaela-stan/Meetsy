@@ -1,5 +1,9 @@
 # Meetsy
 
+## App demo
+
+You can see our application demo video on [YouTube](https://youtu.be/Bw6as8RkyPI).
+
 ## Software development requirements
 ✅ <a href = "https://trello.com/b/UBKxahVz/meetsy"> user stories</a> (at least 10) and backlog creation - 2p
 
@@ -28,3 +32,9 @@
 ✅ design patterns - 1p
   - <a href="https://github.com/stanbianca/Meetsy/commit/75b5fb32f47d8e371df8aed9232edc3b8ea6b8fa#diff-8146540cfd8c562ade7fd89c5b837c5c96e60c9a30fd5325517a50654ec3b816"> react hooks </a>
   - <a href = "https://github.com/stanbianca/Meetsy/commit/881e2157f28a2204ac6cdd206e02d6e1f64b9a1d#diff-f9ff088afe35880a473519f08d83e8bcc098179814da0edb41c094529c67e559"> singleton </a>
+
+
+## References
+
+- [Landing Page Design Inspiration](https://github.com/iamelimars/figma-react-signup)
+
